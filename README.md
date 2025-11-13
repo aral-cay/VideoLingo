@@ -1,1 +1,1 @@
-# COSC67_FinalProject
+# VideoLingo
