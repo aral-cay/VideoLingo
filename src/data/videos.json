@@ -1,0 +1,320 @@
+[
+  {
+    "id": "1",
+    "title": "Italian Vlog - Daily Life",
+    "description": "Experience daily life in Italy through this engaging vlog",
+    "duration": 600,
+    "thumbnail": "https://img.youtube.com/vi/w7kz2lI1IMw/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/w7kz2lI1IMw",
+    "captions": [
+      { "lang": "it", "url": null }
+    ],
+    "quiz": {
+      "instructions": "Answer questions about Italian daily life and culture.",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What is a common Italian greeting?",
+          "choices": ["Ciao", "Hola", "Bonjour", "Hello"],
+          "correctIndex": 0
+        },
+        {
+          "id": "q2",
+          "prompt": "What time do Italians typically have dinner?",
+          "choices": ["6 PM", "7 PM", "8 PM", "9 PM"],
+          "correctIndex": 3
+        },
+        {
+          "id": "q3",
+          "prompt": "What does 'piazza' mean in Italian?",
+          "choices": ["Street", "Square", "Building", "Market"],
+          "correctIndex": 1
+        }
+      ],
+      "passingScore": 2,
+      "maxScoreBehavior": "basic"
+    }
+  },
+  {
+    "id": "2",
+    "title": "Italian Lifestyle Vlog",
+    "description": "Explore Italian lifestyle and culture",
+    "duration": 720,
+    "thumbnail": "https://img.youtube.com/vi/7M2wWIU32Og/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/7M2wWIU32Og",
+    "captions": [
+      { "lang": "it", "url": null }
+    ],
+    "quiz": {
+      "instructions": "Test your knowledge about Italian lifestyle.",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What is 'siesta' called in Italy?",
+          "choices": ["Riposo", "Pausa", "Sonno", "Relax"],
+          "correctIndex": 0
+        },
+        {
+          "id": "q2",
+          "prompt": "What is a typical Italian breakfast?",
+          "choices": ["Pancakes", "Croissant and coffee", "Eggs and bacon", "Cereal"],
+          "correctIndex": 1
+        }
+      ],
+      "passingScore": 1,
+      "maxScoreBehavior": "basic"
+    }
+  },
+  {
+    "id": "4",
+    "title": "Italian Lifestyle Experience",
+    "description": "A day in the life in Italy",
+    "duration": 480,
+    "thumbnail": "https://img.youtube.com/vi/6Wx5FppYG5Y/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/6Wx5FppYG5Y",
+    "captions": [
+      { "lang": "it", "url": null }
+    ],
+    "quiz": {
+      "instructions": "Test your understanding of Italian daily life.",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What is 'buongiorno' used for?",
+          "choices": ["Good morning", "Good night", "Goodbye", "Good afternoon"],
+          "correctIndex": 0
+        },
+        {
+          "id": "q2",
+          "prompt": "What does 'arrivederci' mean?",
+          "choices": ["Hello", "Goodbye", "See you later", "Both B and C"],
+          "correctIndex": 3
+        }
+      ],
+      "passingScore": 1,
+      "maxScoreBehavior": "basic"
+    }
+  },
+  {
+    "id": "5",
+    "title": "Italian Vlog Series - Part 4",
+    "description": "Fourth episode of an Italian vlog series",
+    "duration": 840,
+    "thumbnail": "https://img.youtube.com/vi/v89xFHmq3SM/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/v89xFHmq3SM",
+    "captions": [
+      { "lang": "it", "url": null }
+    ],
+    "quiz": {
+      "instructions": "Answer questions about Italian expressions and culture.",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What does 'come stai?' mean?",
+          "choices": ["How are you?", "What's your name?", "Where are you?", "What time is it?"],
+          "correctIndex": 0
+        },
+        {
+          "id": "q2",
+          "prompt": "What is the response to 'grazie'?",
+          "choices": ["Prego", "Scusa", "Ciao", "Arrivederci"],
+          "correctIndex": 0
+        },
+        {
+          "id": "q3",
+          "prompt": "What does 'buonasera' mean?",
+          "choices": ["Good morning", "Good afternoon", "Good evening", "Good night"],
+          "correctIndex": 2
+        }
+      ],
+      "passingScore": 2,
+      "maxScoreBehavior": "basic"
+    }
+  },
+  {
+    "id": "6",
+    "title": "Italian Lifestyle Vlog",
+    "description": "Exploring Italian culture and traditions",
+    "duration": 660,
+    "thumbnail": "https://img.youtube.com/vi/0GqMNKBih9k/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/0GqMNKBih9k",
+    "captions": [
+      { "lang": "it", "url": null }
+    ],
+    "quiz": {
+      "instructions": "Test your knowledge of Italian culture.",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What is Italy's national language?",
+          "choices": ["Spanish", "Italian", "French", "English"],
+          "correctIndex": 1
+        },
+        {
+          "id": "q2",
+          "prompt": "What does 'scusa' mean?",
+          "choices": ["Thank you", "Please", "Sorry/Excuse me", "Hello"],
+          "correctIndex": 2
+        }
+      ],
+      "passingScore": 1,
+      "maxScoreBehavior": "basic"
+    }
+  },
+  {
+    "id": "7",
+    "title": "Italian Cooking - Traditional Recipe",
+    "description": "Learn to cook authentic Italian dishes",
+    "duration": 1200,
+    "thumbnail": "https://img.youtube.com/vi/0ipPqza07eM/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/0ipPqza07eM",
+    "captions": [
+      { "lang": "it", "url": null }
+    ],
+    "quiz": {
+      "instructions": "Answer questions about Italian cooking and food vocabulary.",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What does 'pasta' mean in Italian?",
+          "choices": ["Pasta", "Bread", "Rice", "Soup"],
+          "correctIndex": 0
+        },
+        {
+          "id": "q2",
+          "prompt": "What is 'pomodoro'?",
+          "choices": ["Potato", "Tomato", "Pepper", "Onion"],
+          "correctIndex": 1
+        },
+        {
+          "id": "q3",
+          "prompt": "What does 'al dente' mean?",
+          "choices": ["Overcooked", "Firm to the bite", "Raw", "Soft"],
+          "correctIndex": 1
+        },
+        {
+          "id": "q4",
+          "prompt": "What is 'olio d'oliva'?",
+          "choices": ["Butter", "Olive oil", "Vegetable oil", "Coconut oil"],
+          "correctIndex": 1
+        }
+      ],
+      "passingScore": 3,
+      "maxScoreBehavior": "basic"
+    }
+  },
+  {
+    "id": "8",
+    "title": "Italian Cooking - Advanced Techniques",
+    "description": "Master advanced Italian cooking techniques",
+    "duration": 1500,
+    "thumbnail": "https://img.youtube.com/vi/hIS9QwPyvFs/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/hIS9QwPyvFs",
+    "captions": [
+      { "lang": "it", "url": null }
+    ],
+    "quiz": {
+      "instructions": "Test your knowledge of Italian cooking terms.",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What does 'formaggio' mean?",
+          "choices": ["Cheese", "Flour", "Sugar", "Salt"],
+          "correctIndex": 0
+        },
+        {
+          "id": "q2",
+          "prompt": "What is 'aglio'?",
+          "choices": ["Onion", "Garlic", "Basil", "Oregano"],
+          "correctIndex": 1
+        },
+        {
+          "id": "q3",
+          "prompt": "What does 'sale' mean?",
+          "choices": ["Sugar", "Salt", "Pepper", "Vinegar"],
+          "correctIndex": 1
+        }
+      ],
+      "passingScore": 2,
+      "maxScoreBehavior": "basic"
+    }
+  },
+  {
+    "id": "9",
+    "title": "Italian Cooking - Regional Specialties",
+    "description": "Discover regional Italian cooking specialties",
+    "duration": 1080,
+    "thumbnail": "https://img.youtube.com/vi/d5veFsTY-OU/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/d5veFsTY-OU",
+    "captions": [
+      { "lang": "it", "url": null }
+    ],
+    "quiz": {
+      "instructions": "Answer questions about Italian regional cuisine.",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What does 'pizza' mean?",
+          "choices": ["Pasta", "Pizza", "Bread", "Cake"],
+          "correctIndex": 1
+        },
+        {
+          "id": "q2",
+          "prompt": "What is 'gelato'?",
+          "choices": ["Ice cream", "Cake", "Cookie", "Candy"],
+          "correctIndex": 0
+        },
+        {
+          "id": "q3",
+          "prompt": "What does 'pane' mean?",
+          "choices": ["Water", "Bread", "Meat", "Fish"],
+          "correctIndex": 1
+        },
+        {
+          "id": "q4",
+          "prompt": "What is 'acqua'?",
+          "choices": ["Wine", "Water", "Milk", "Juice"],
+          "correctIndex": 1
+        }
+      ],
+      "passingScore": 3,
+      "maxScoreBehavior": "basic"
+    }
+  },
+  {
+    "id": "10",
+    "title": "Italian Cooking - Classic Dish",
+    "description": "Learn to prepare a classic Italian dish",
+    "duration": 960,
+    "thumbnail": "https://img.youtube.com/vi/zXZq6crD6WI/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/zXZq6crD6WI",
+    "captions": [
+      { "lang": "it", "url": null }
+    ],
+    "quiz": {
+      "instructions": "Test your Italian food vocabulary.",
+      "questions": [
+        {
+          "id": "q1",
+          "prompt": "What does 'carne' mean?",
+          "choices": ["Chicken", "Meat", "Fish", "Vegetable"],
+          "correctIndex": 1
+        },
+        {
+          "id": "q2",
+          "prompt": "What is 'pesce'?",
+          "choices": ["Meat", "Fish", "Chicken", "Beef"],
+          "correctIndex": 1
+        },
+        {
+          "id": "q3",
+          "prompt": "What does 'verdura' mean?",
+          "choices": ["Fruit", "Vegetable", "Meat", "Bread"],
+          "correctIndex": 1
+        }
+      ],
+      "passingScore": 2,
+      "maxScoreBehavior": "basic"
+    }
+  }
+]
