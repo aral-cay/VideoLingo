@@ -161,7 +161,7 @@ export function GamifiedQuiz({
 
   const handleContinue = () => {
     const question = quiz.questions[currentQuestionIndex];
-    const responseTime = questionStopwatch.elapsed;
+    const responseTime = questionStopwatch.getElapsed();
     const correctAnswer = question.choices[question.correctIndex];
     const correctWords = correctAnswer
       .split(/\s+/)
@@ -235,7 +235,7 @@ export function GamifiedQuiz({
               You'll see an English sentence. Click Italian words in the correct order to translate it.
             </p>
             <button className="gamified-quiz-start-button" onClick={handleStartQuiz}>
-              Start Quiz
+              Begin Game
             </button>
           </div>
         </div>
