@@ -2,60 +2,76 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { QuizModal } from '../components/QuizModal';
+import { GamifiedQuiz } from '../components/GamifiedQuiz';
 import videosData from '../data/videos.json';
 import type { Video } from '../types';
 import lexosaLogo from '../assets/lexosa-logo.png';
+import { isVideoUnlocked, markVideoCompleted } from '../utils/userProgress';
+import { getVideoState, saveVideoState } from '../utils/videoState';
+import { saveQuizResult } from '../utils/quizResults';
+import { isGamifiedUser } from '../utils/userVersion';
+import { addXP, saveVideoStars, calculateStars, calculateXP, updateStreak, getGamificationData, updateHearts } from '../utils/gamification';
 
 export function Player() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { userId, username, logout } = useAuth();
   const [videos] = useState<Video[]>(videosData as Video[]);
   const video = videos.find((v) => v.id === id);
+  const videoIndex = videos.findIndex((v) => v.id === id);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [captionsEnabled, setCaptionsEnabled] = useState(false);
   const [quizVisible, setQuizVisible] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [videoPaused, setVideoPaused] = useState(false);
+  const [currentHearts, setCurrentHearts] = useState<number>(20);
 
   useEffect(() => {
-    if (!video) {
+    if (!video || !userId) {
       navigate('/');
       return;
     }
 
-    // Load per-video state
-    const videoStateKey = `video_state:${video.id}`;
-    const savedState = localStorage.getItem(videoStateKey);
-    if (savedState) {
-      try {
-        const state = JSON.parse(savedState);
-        setCaptionsEnabled(state.lastCaptionState || false);
-        if (state.lastPositionSec && videoRef.current && !videoRef.current.src.includes('youtube.com')) {
-          videoRef.current.currentTime = state.lastPositionSec;
-        }
-      } catch (e) {
-        console.error('Failed to load video state:', e);
+    // Check if video is unlocked
+    const checkUnlock = async () => {
+      const allVideoIds = videos.map(v => v.id);
+      const unlocked = await isVideoUnlocked(userId, video.id, videoIndex, allVideoIds);
+      if (!unlocked) {
+        navigate('/');
+        return;
       }
-    }
 
-    return () => {
-      // Save video state
-      if (videoRef.current && video && !videoRef.current.src.includes('youtube.com')) {
-        const completionPercent =
-          videoRef.current.duration > 0
-            ? (videoRef.current.currentTime / videoRef.current.duration) * 100
-            : 0;
-        const videoState = {
-          completionPercent,
-          lastPositionSec: videoRef.current.currentTime,
-          lastCaptionState: captionsEnabled,
-        };
-        localStorage.setItem(`video_state:${video.id}`, JSON.stringify(videoState));
+      // Load video state from Supabase
+      const savedState = await getVideoState(userId, video.id);
+      if (savedState) {
+        setCaptionsEnabled(savedState.lastCaptionState || false);
+        if (savedState.lastPositionSec && videoRef.current && !videoRef.current.src.includes('youtube.com')) {
+          videoRef.current.currentTime = savedState.lastPositionSec;
+        }
       }
     };
-  }, [video, navigate, captionsEnabled]);
+
+    checkUnlock();
+
+    return () => {
+      // Save video state to Supabase
+      const saveState = async () => {
+        if (videoRef.current && video && userId && !videoRef.current.src.includes('youtube.com')) {
+          const completionPercent =
+            videoRef.current.duration > 0
+              ? (videoRef.current.currentTime / videoRef.current.duration) * 100
+              : 0;
+          await saveVideoState(userId, video.id, {
+            completionPercent,
+            lastPositionSec: videoRef.current.currentTime,
+            lastCaptionState: captionsEnabled,
+          });
+        }
+      };
+      saveState();
+    };
+  }, [video, navigate, captionsEnabled, userId, videoIndex, videos]);
 
   const handlePlay = () => {
     if (videoRef.current) {
@@ -79,16 +95,20 @@ export function Player() {
     // Time update handler if needed
   };
 
-  const handleCaptionsToggle = () => {
+  const handleCaptionsToggle = async () => {
     const newState = !captionsEnabled;
     setCaptionsEnabled(newState);
-    // Save state
-    if (video) {
-      const videoStateKey = `video_state:${video.id}`;
-      const savedState = localStorage.getItem(videoStateKey);
-      const state = savedState ? JSON.parse(savedState) : {};
-      state.lastCaptionState = newState;
-      localStorage.setItem(videoStateKey, JSON.stringify(state));
+    // Save state to Supabase
+    if (video && userId && videoRef.current) {
+      const completionPercent =
+        videoRef.current.duration > 0
+          ? (videoRef.current.currentTime / videoRef.current.duration) * 100
+          : 0;
+      await saveVideoState(userId, video.id, {
+        completionPercent,
+        lastPositionSec: videoRef.current.currentTime,
+        lastCaptionState: newState,
+      });
     }
   };
 
@@ -100,7 +120,7 @@ export function Player() {
     setQuizVisible(visible);
   };
 
-  const handleQuizComplete = (score: {
+  const handleQuizComplete = async (score: {
     correct: number;
     total: number;
     accuracy: number;
@@ -108,8 +128,8 @@ export function Player() {
     setQuizCompleted(true);
     setQuizStarted(true);
 
-    // Save quiz results
-    if (video) {
+    // Save quiz results and mark video as completed
+    if (video && userId && username) {
       const quizResults = {
         videoId: video.id,
         completedAt: Date.now(),
@@ -118,10 +138,31 @@ export function Player() {
         totalQuestions: score.total,
         scoreAccuracy: score.accuracy,
       };
-      localStorage.setItem(
-        `quiz_results:${video.id}`,
-        JSON.stringify(quizResults)
-      );
+
+      // Save to Supabase
+      await saveQuizResult(userId, quizResults);
+
+      // Mark video as completed and unlock next video
+      await markVideoCompleted(userId, video.id, score.correct, score.total);
+      
+      // Handle gamification for gamified users
+      if (isGamifiedUser(username)) {
+        // Calculate and save stars
+        const stars = calculateStars(score.correct, score.total);
+        await saveVideoStars(userId, video.id, stars);
+        
+        // Calculate and award XP: +5 per correct, +10 for 8/10+, +20 for 10/10
+        const xpReward = calculateXP(score.correct, score.total);
+        await addXP(userId, xpReward);
+        
+        // Hearts are already deducted in real-time during quiz, no need to deduct again
+        
+        // Update streak
+        await updateStreak(userId);
+      }
+      
+      // Dispatch custom event to notify Home page to refresh
+      window.dispatchEvent(new Event('videoCompleted'));
     }
   };
 
@@ -213,8 +254,8 @@ export function Player() {
               <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="currentColor"/>
             </svg>
           </button>
-          <div className="youtube-profile-icon" aria-label="Profile" title={user || 'User'}>
-            <span>{user ? user.charAt(0).toUpperCase() : 'A'}</span>
+          <div className="youtube-profile-icon" aria-label="Profile" title={username || 'User'}>
+            <span>{username ? username.charAt(0).toUpperCase() : 'A'}</span>
           </div>
           <button 
             className="youtube-logout-button" 
@@ -382,13 +423,25 @@ export function Player() {
       {/* Quiz Sidebar */}
       {quizVisible && (
         <aside className="youtube-quiz-sidebar">
-          <QuizModal
-            quiz={video.quiz}
-            onClose={handleReturnHome}
-            onComplete={handleQuizComplete}
-            isVisible={quizVisible}
-            onVisibilityChange={handleQuizVisibilityChange}
-          />
+          {isGamifiedUser(username) ? (
+            <GamifiedQuiz
+              quiz={video.quiz}
+              onClose={handleReturnHome}
+              onComplete={handleQuizComplete}
+              isVisible={quizVisible}
+              onVisibilityChange={handleQuizVisibilityChange}
+              userId={userId}
+              onHeartsUpdate={setCurrentHearts}
+            />
+          ) : (
+            <QuizModal
+              quiz={video.quiz}
+              onClose={handleReturnHome}
+              onComplete={handleQuizComplete}
+              isVisible={quizVisible}
+              onVisibilityChange={handleQuizVisibilityChange}
+            />
+          )}
         </aside>
       )}
     </div>

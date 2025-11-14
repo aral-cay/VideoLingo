@@ -35,6 +35,8 @@ export function QuizModal({
   const [answers, setAnswers] = useState<Array<{ questionId: string; answerIndex: number; correct: boolean; responseTime: number }>>([]);
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
   const questionStopwatch = useStopwatch();
   const quizStartTimeRef = useRef<number | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -64,11 +66,22 @@ export function QuizModal({
     setSelectedAnswer(index);
   };
 
-  const handleNext = () => {
+  const handleSubmit = () => {
     if (selectedAnswer === null) return;
 
     const question = quiz.questions[currentQuestionIndex];
     const responseTime = questionStopwatch.stop();
+    const isCorrect = selectedAnswer === question.correctIndex;
+
+    setLastAnswerCorrect(isCorrect);
+    setShowFeedback(true);
+  };
+
+  const handleContinue = () => {
+    if (selectedAnswer === null) return;
+
+    const question = quiz.questions[currentQuestionIndex];
+    const responseTime = questionStopwatch.elapsed;
     const isCorrect = selectedAnswer === question.correctIndex;
 
     const answerData = {
@@ -79,6 +92,9 @@ export function QuizModal({
     };
 
     const updatedAnswers = [...answers, answerData];
+
+    setShowFeedback(false);
+    setLastAnswerCorrect(null);
 
     if (currentQuestionIndex < quiz.questions.length - 1) {
       setAnswers(updatedAnswers);
@@ -230,31 +246,72 @@ export function QuizModal({
         </div>
         <div className="quiz-question">
           <p className="quiz-prompt">{currentQuestion.prompt}</p>
-          <fieldset className="quiz-choices">
+          <fieldset className="quiz-choices" disabled={showFeedback}>
             <legend className="sr-only">Select an answer</legend>
-            {currentQuestion.choices.map((choice, index) => (
-              <label key={index} className="quiz-choice">
-                <input
-                  type="radio"
-                  name={`question-${currentQuestion.id}`}
-                  value={index}
-                  checked={selectedAnswer === index}
-                  onChange={() => handleAnswerSelect(index)}
-                  aria-label={`Option ${index + 1}: ${choice}`}
-                />
-                <span>{choice}</span>
-              </label>
-            ))}
+            {currentQuestion.choices.map((choice, index) => {
+              const isSelected = selectedAnswer === index;
+              const isCorrect = index === currentQuestion.correctIndex;
+              const showAsCorrect = showFeedback && isCorrect;
+              const showAsIncorrect = showFeedback && isSelected && !isCorrect;
+              
+              return (
+                <label 
+                  key={index} 
+                  className={`quiz-choice ${showAsCorrect ? 'quiz-choice-correct' : ''} ${showAsIncorrect ? 'quiz-choice-incorrect' : ''}`}
+                >
+                  <input
+                    type="radio"
+                    name={`question-${currentQuestion.id}`}
+                    value={index}
+                    checked={isSelected}
+                    onChange={() => handleAnswerSelect(index)}
+                    disabled={showFeedback}
+                    aria-label={`Option ${index + 1}: ${choice}`}
+                  />
+                  <span>{choice}</span>
+                </label>
+              );
+            })}
           </fieldset>
+          
+          {showFeedback && (
+            <div className={`quiz-feedback ${lastAnswerCorrect ? 'quiz-feedback-correct' : 'quiz-feedback-incorrect'}`}>
+              {lastAnswerCorrect ? (
+                <div className="feedback-content">
+                  <span className="feedback-icon">✓</span>
+                  <span className="feedback-text">Correct!</span>
+                </div>
+              ) : (
+                <div className="feedback-content">
+                  <span className="feedback-icon">✗</span>
+                  <span className="feedback-text">Incorrect</span>
+                  <div className="feedback-correct-answer">
+                    Correct answer: <strong>{currentQuestion.choices[currentQuestion.correctIndex]}</strong>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
           <div className="quiz-actions">
-            <button
-              className="quiz-next-button"
-              onClick={handleNext}
-              disabled={selectedAnswer === null}
-              aria-label={isLastQuestion ? 'Submit quiz' : 'Next question'}
-            >
-              {isLastQuestion ? 'Submit' : 'Next'}
-            </button>
+            {!showFeedback ? (
+              <button
+                className="quiz-next-button"
+                onClick={handleSubmit}
+                disabled={selectedAnswer === null}
+                aria-label="Submit answer"
+              >
+                Check
+              </button>
+            ) : (
+              <button
+                className="quiz-next-button"
+                onClick={handleContinue}
+                aria-label={isLastQuestion ? 'Submit quiz' : 'Next question'}
+              >
+                {isLastQuestion ? 'Finish' : 'Continue'}
+              </button>
+            )}
           </div>
         </div>
       </div>

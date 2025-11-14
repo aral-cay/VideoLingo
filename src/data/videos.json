@@ -2,318 +2,1572 @@
   {
     "id": "1",
     "title": "Italian Vlog - Daily Life",
-    "description": "Experience daily life in Italy through this engaging vlog",
+    "description": "Learn Italian through vlogs / lifestyle content",
     "duration": 600,
     "thumbnail": "https://img.youtube.com/vi/w7kz2lI1IMw/maxresdefault.jpg",
     "src": "https://www.youtube.com/embed/w7kz2lI1IMw",
     "captions": [
-      { "lang": "it", "url": null }
+      {
+        "lang": "it",
+        "url": null
+      }
     ],
     "quiz": {
-      "instructions": "Answer questions about Italian daily life and culture.",
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
       "questions": [
         {
-          "id": "q1",
-          "prompt": "What is a common Italian greeting?",
-          "choices": ["Ciao", "Hola", "Bonjour", "Hello"],
-          "correctIndex": 0
-        },
-        {
-          "id": "q2",
-          "prompt": "What time do Italians typically have dinner?",
-          "choices": ["6 PM", "7 PM", "8 PM", "9 PM"],
+          "id": "01-01",
+          "prompt": "Translate to Italian: We cook the asparagus with oil and salt.",
+          "choices": [
+            "Mettiamo il filetto di alice sopra",
+            "Prepariamo la cena insieme a mamma",
+            "Condiamo gli asparagi con olio e sale",
+            "Cuciniamo gli asparagi con olio e sale"
+          ],
           "correctIndex": 3
         },
         {
-          "id": "q3",
-          "prompt": "What does 'piazza' mean in Italian?",
-          "choices": ["Street", "Square", "Building", "Market"],
+          "id": "01-02",
+          "prompt": "Translate to Italian: We prepare dinner together with Mom.",
+          "choices": [
+            "Le alici sono ricche di omega tre",
+            "Cuciniamo gli asparagi con olio e sale",
+            "Usiamo il cestino per la cottura a vapore",
+            "Prepariamo la cena insieme a mamma"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "01-03",
+          "prompt": "Translate to Italian: I put the eggs to boil for dinner.",
+          "choices": [
+            "Gli asparagi sono di stagione adesso",
+            "Prepariamo la cena insieme a mamma",
+            "Condiamo gli asparagi con olio e sale",
+            "Metto le uova a bollire per la cena"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "01-04",
+          "prompt": "Translate to Italian: Asparagus are in season now.",
+          "choices": [
+            "Cuciniamo gli asparagi con olio e sale",
+            "Gli asparagi sono di stagione adesso",
+            "Prepariamo la cena insieme a mamma",
+            "Nel frigo troviamo anche le olive"
+          ],
           "correctIndex": 1
+        },
+        {
+          "id": "01-05",
+          "prompt": "Translate to Italian: Anchovies are rich in omega three.",
+          "choices": [
+            "Nel frigo troviamo anche le olive",
+            "Condiamo gli asparagi con olio e sale",
+            "Le alici sono ricche di omega tre",
+            "Prepariamo la cena insieme a mamma"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "01-06",
+          "prompt": "Translate to Italian: In the fridge we also find the olives.",
+          "choices": [
+            "Nel frigo troviamo anche le olive",
+            "Aggiungo un filo di maionese sulle uova",
+            "Condiamo gli asparagi con olio e sale",
+            "Mettiamo il filetto di alice sopra"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "01-07",
+          "prompt": "Translate to Italian: We dress the asparagus with oil and salt.",
+          "choices": [
+            "Nel frigo troviamo anche le olive",
+            "Condiamo gli asparagi con olio e sale",
+            "Mettiamo il filetto di alice sopra",
+            "Prepariamo la cena insieme a mamma"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "01-08",
+          "prompt": "Translate to Italian: We use the basket for steaming.",
+          "choices": [
+            "Nel frigo troviamo anche le olive",
+            "Le alici sono ricche di omega tre",
+            "Usiamo il cestino per la cottura a vapore",
+            "Condiamo gli asparagi con olio e sale"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "01-09",
+          "prompt": "Translate to Italian: I add a touch of mayonnaise on the eggs.",
+          "choices": [
+            "Aggiungo un filo di maionese sulle uova",
+            "Metto le uova a bollire per la cena",
+            "Nel frigo troviamo anche le olive",
+            "Le alici sono ricche di omega tre"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "01-10",
+          "prompt": "Translate to Italian: We put the anchovy fillet on top.",
+          "choices": [
+            "Mettiamo il filetto di alice sopra",
+            "Aggiungo un filo di maionese sulle uova",
+            "Le alici sono ricche di omega tre",
+            "Usiamo il cestino per la cottura a vapore"
+          ],
+          "correctIndex": 0
         }
       ],
-      "passingScore": 2,
+      "passingScore": 5,
       "maxScoreBehavior": "basic"
     }
   },
   {
     "id": "2",
     "title": "Italian Lifestyle Vlog",
-    "description": "Explore Italian lifestyle and culture",
-    "duration": 720,
+    "description": "Learn Italian through vlogs / lifestyle content",
+    "duration": 600,
     "thumbnail": "https://img.youtube.com/vi/7M2wWIU32Og/maxresdefault.jpg",
     "src": "https://www.youtube.com/embed/7M2wWIU32Og",
     "captions": [
-      { "lang": "it", "url": null }
+      {
+        "lang": "it",
+        "url": null
+      }
     ],
     "quiz": {
-      "instructions": "Test your knowledge about Italian lifestyle.",
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
       "questions": [
         {
-          "id": "q1",
-          "prompt": "What is 'siesta' called in Italy?",
-          "choices": ["Riposo", "Pausa", "Sonno", "Relax"],
+          "id": "02-01",
+          "prompt": "Translate to Italian: The potholes in the streets make people laugh and get angry.",
+          "choices": [
+            "Le buche nelle strade fanno ridere e arrabbiare",
+            "All'Eur c'è un grattacielo molto alto",
+            "Dal Gianicolo si vede la cupola di San Pietro",
+            "Roma nord è più benestante di Roma sud"
+          ],
           "correctIndex": 0
         },
         {
-          "id": "q2",
-          "prompt": "What is a typical Italian breakfast?",
-          "choices": ["Pancakes", "Croissant and coffee", "Eggs and bacon", "Cereal"],
+          "id": "02-02",
+          "prompt": "Translate to Italian: From the Janiculum you can see Saint Peter's dome.",
+          "choices": [
+            "I cittadini e i turisti vivono realtà diverse",
+            "Roma è una città complessa e bellissima",
+            "All'Eur c'è un grattacielo molto alto",
+            "Dal Gianicolo si vede la cupola di San Pietro"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "02-03",
+          "prompt": "Translate to Italian: Rome is a complex and beautiful city.",
+          "choices": [
+            "I cittadini e i turisti vivono realtà diverse",
+            "Roma è una città complessa e bellissima",
+            "Le buche nelle strade fanno ridere e arrabbiare",
+            "In periferia trovi bar e famiglie al parco"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "02-04",
+          "prompt": "Translate to Italian: North Rome is wealthier than south Rome.",
+          "choices": [
+            "I Parioli sono un quartiere di Roma nord",
+            "Molti romani vivono fuori dal centro",
+            "Roma nord è più benestante di Roma sud",
+            "Roma è una città complessa e bellissima"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "02-05",
+          "prompt": "Translate to Italian: In Eur there is a very tall skyscraper.",
+          "choices": [
+            "Roma è una città complessa e bellissima",
+            "All'Eur c'è un grattacielo molto alto",
+            "In periferia trovi bar e famiglie al parco",
+            "I Parioli sono un quartiere di Roma nord"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "02-06",
+          "prompt": "Translate to Italian: Rome has few skyscrapers in the historic center.",
+          "choices": [
+            "Roma ha poche grattacieli nel centro storico",
+            "Le buche nelle strade fanno ridere e arrabbiare",
+            "Dal Gianicolo si vede la cupola di San Pietro",
+            "Roma nord è più benestante di Roma sud"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "02-07",
+          "prompt": "Translate to Italian: In the suburbs you find bars and families at the park.",
+          "choices": [
+            "Molti romani vivono fuori dal centro",
+            "Dal Gianicolo si vede la cupola di San Pietro",
+            "Roma ha poche grattacieli nel centro storico",
+            "In periferia trovi bar e famiglie al parco"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "02-08",
+          "prompt": "Translate to Italian: Parioli is a neighborhood in north Rome.",
+          "choices": [
+            "Roma ha poche grattacieli nel centro storico",
+            "Roma è una città complessa e bellissima",
+            "I Parioli sono un quartiere di Roma nord",
+            "Le buche nelle strade fanno ridere e arrabbiare"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "02-09",
+          "prompt": "Translate to Italian: Citizens and tourists live different realities.",
+          "choices": [
+            "I cittadini e i turisti vivono realtà diverse",
+            "Roma nord è più benestante di Roma sud",
+            "Molti romani vivono fuori dal centro",
+            "Dal Gianicolo si vede la cupola di San Pietro"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "02-10",
+          "prompt": "Translate to Italian: Many Romans live outside the center.",
+          "choices": [
+            "Dal Gianicolo si vede la cupola di San Pietro",
+            "Molti romani vivono fuori dal centro",
+            "Roma nord è più benestante di Roma sud",
+            "I cittadini e i turisti vivono realtà diverse"
+          ],
           "correctIndex": 1
         }
       ],
-      "passingScore": 1,
+      "passingScore": 5,
+      "maxScoreBehavior": "basic"
+    }
+  },
+  {
+    "id": "3",
+    "title": "Italian Travel Vlog",
+    "description": "Learn Italian through vlogs / lifestyle content",
+    "duration": 600,
+    "thumbnail": "https://img.youtube.com/vi/-M1I6nrC_Bk/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/-M1I6nrC_Bk",
+    "captions": [
+      {
+        "lang": "it",
+        "url": null
+      }
+    ],
+    "quiz": {
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
+      "questions": [
+        {
+          "id": "03-01",
+          "prompt": "Translate to Italian: We go to see the Maradona mural.",
+          "choices": [
+            "Andiamo a vedere il murale di Maradona",
+            "A Napoli facciamo colazione da Gambrinus",
+            "Nei quartieri spagnoli ci sono botteghe e trattorie",
+            "Visitiamo Piazza del Plebiscito insieme"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "03-02",
+          "prompt": "Translate to Italian: The Royal Palace of Naples is splendid.",
+          "choices": [
+            "A Napoli facciamo colazione da Gambrinus",
+            "Maradona ha portato molte vittorie al Napoli",
+            "Passeggiamo sul lungomare di Chiaia",
+            "Il Palazzo Reale di Napoli è splendido"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "03-03",
+          "prompt": "Translate to Italian: We visit Piazza del Plebiscito together.",
+          "choices": [
+            "Prendiamo due cappuccini e due sfogliatelle",
+            "Andiamo a vedere il murale di Maradona",
+            "A Napoli facciamo colazione da Gambrinus",
+            "Visitiamo Piazza del Plebiscito insieme"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "03-04",
+          "prompt": "Translate to Italian: The Toledo metro station is very beautiful.",
+          "choices": [
+            "Passeggiamo sul lungomare di Chiaia",
+            "Beviamo uno spritz alla bancarella",
+            "Maradona ha portato molte vittorie al Napoli",
+            "La metro Toledo è molto bella"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "03-05",
+          "prompt": "Translate to Italian: In the Spanish Quarters there are shops and trattorias.",
+          "choices": [
+            "Beviamo uno spritz alla bancarella",
+            "Maradona ha portato molte vittorie al Napoli",
+            "Nei quartieri spagnoli ci sono botteghe e trattorie",
+            "Visitiamo Piazza del Plebiscito insieme"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "03-06",
+          "prompt": "Translate to Italian: In Naples we have breakfast at Gambrinus.",
+          "choices": [
+            "Nei quartieri spagnoli ci sono botteghe e trattorie",
+            "A Napoli facciamo colazione da Gambrinus",
+            "Il Palazzo Reale di Napoli è splendido",
+            "Andiamo a vedere il murale di Maradona"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "03-07",
+          "prompt": "Translate to Italian: Maradona brought many victories to Napoli.",
+          "choices": [
+            "Visitiamo Piazza del Plebiscito insieme",
+            "A Napoli facciamo colazione da Gambrinus",
+            "La metro Toledo è molto bella",
+            "Maradona ha portato molte vittorie al Napoli"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "03-08",
+          "prompt": "Translate to Italian: We get two cappuccinos and two sfogliatellas.",
+          "choices": [
+            "Prendiamo due cappuccini e due sfogliatelle",
+            "Il Palazzo Reale di Napoli è splendido",
+            "Andiamo a vedere il murale di Maradona",
+            "Nei quartieri spagnoli ci sono botteghe e trattorie"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "03-09",
+          "prompt": "Translate to Italian: We drink an Aperol spritz at the stall.",
+          "choices": [
+            "Beviamo uno spritz alla bancarella",
+            "Visitiamo Piazza del Plebiscito insieme",
+            "Maradona ha portato molte vittorie al Napoli",
+            "Prendiamo due cappuccini e due sfogliatelle"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "03-10",
+          "prompt": "Translate to Italian: We walk on the seafront in Chiaia.",
+          "choices": [
+            "Visitiamo Piazza del Plebiscito insieme",
+            "Passeggiamo sul lungomare di Chiaia",
+            "A Napoli facciamo colazione da Gambrinus",
+            "Il Palazzo Reale di Napoli è splendido"
+          ],
+          "correctIndex": 1
+        }
+      ],
+      "passingScore": 5,
       "maxScoreBehavior": "basic"
     }
   },
   {
     "id": "4",
-    "title": "Italian Lifestyle Experience",
-    "description": "A day in the life in Italy",
-    "duration": 480,
+    "title": "Italian Lifestyle Content",
+    "description": "Learn Italian through vlogs / lifestyle content",
+    "duration": 600,
     "thumbnail": "https://img.youtube.com/vi/6Wx5FppYG5Y/maxresdefault.jpg",
     "src": "https://www.youtube.com/embed/6Wx5FppYG5Y",
     "captions": [
-      { "lang": "it", "url": null }
+      {
+        "lang": "it",
+        "url": null
+      }
     ],
     "quiz": {
-      "instructions": "Test your understanding of Italian daily life.",
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
       "questions": [
         {
-          "id": "q1",
-          "prompt": "What is 'buongiorno' used for?",
-          "choices": ["Good morning", "Good night", "Goodbye", "Good afternoon"],
+          "id": "04-01",
+          "prompt": "Translate to Italian: The Upper Lazio coast is near Tuscany.",
+          "choices": [
+            "A Roma oggi fa molto caldo",
+            "Oggi a Roma è festa per i Santi Pietro e Paolo",
+            "Andiamo a vedere i fuochi a Castel Sant'Angelo",
+            "La costa dell'Alto Lazio è vicina alla Toscana"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "04-02",
+          "prompt": "Translate to Italian: There is a lot of traffic near Prati.",
+          "choices": [
+            "Prepariamo la valigia per la vacanza",
+            "Oggi a Roma è festa per i Santi Pietro e Paolo",
+            "C'è molto traffico vicino a Prati",
+            "Portiamo i cani a passeggiare sulla spiaggia"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "04-03",
+          "prompt": "Translate to Italian: Tomorrow we go to the sea in Lazio.",
+          "choices": [
+            "Prepariamo la valigia per la vacanza",
+            "Andiamo a vedere i fuochi a Castel Sant'Angelo",
+            "Domani andiamo al mare nel Lazio",
+            "La costa dell'Alto Lazio è vicina alla Toscana"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "04-04",
+          "prompt": "Translate to Italian: In Rome it is very hot today.",
+          "choices": [
+            "Prepariamo la valigia per la vacanza",
+            "Portiamo i cani a passeggiare sulla spiaggia",
+            "La Girandola è uno spettacolo pirotecnico antico",
+            "A Roma oggi fa molto caldo"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "04-05",
+          "prompt": "Translate to Italian: We go to see the fireworks at Castel Sant'Angelo.",
+          "choices": [
+            "La costa dell'Alto Lazio è vicina alla Toscana",
+            "La Girandola è uno spettacolo pirotecnico antico",
+            "In spiaggia beviamo caffè e leggiamo un libro",
+            "Andiamo a vedere i fuochi a Castel Sant'Angelo"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "04-06",
+          "prompt": "Translate to Italian: We prepare the suitcase for the vacation.",
+          "choices": [
+            "In spiaggia beviamo caffè e leggiamo un libro",
+            "Portiamo i cani a passeggiare sulla spiaggia",
+            "Prepariamo la valigia per la vacanza",
+            "Domani andiamo al mare nel Lazio"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "04-07",
+          "prompt": "Translate to Italian: On the beach we drink coffee and read a book.",
+          "choices": [
+            "Andiamo a vedere i fuochi a Castel Sant'Angelo",
+            "A Roma oggi fa molto caldo",
+            "La costa dell'Alto Lazio è vicina alla Toscana",
+            "In spiaggia beviamo caffè e leggiamo un libro"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "04-08",
+          "prompt": "Translate to Italian: The Girandola is an ancient fireworks show.",
+          "choices": [
+            "La Girandola è uno spettacolo pirotecnico antico",
+            "La costa dell'Alto Lazio è vicina alla Toscana",
+            "C'è molto traffico vicino a Prati",
+            "In spiaggia beviamo caffè e leggiamo un libro"
+          ],
           "correctIndex": 0
         },
         {
-          "id": "q2",
-          "prompt": "What does 'arrivederci' mean?",
-          "choices": ["Hello", "Goodbye", "See you later", "Both B and C"],
-          "correctIndex": 3
+          "id": "04-09",
+          "prompt": "Translate to Italian: Today in Rome is a holiday for Saints Peter and Paul.",
+          "choices": [
+            "C'è molto traffico vicino a Prati",
+            "La costa dell'Alto Lazio è vicina alla Toscana",
+            "Oggi a Roma è festa per i Santi Pietro e Paolo",
+            "La Girandola è uno spettacolo pirotecnico antico"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "04-10",
+          "prompt": "Translate to Italian: We take the dogs for a walk on the beach.",
+          "choices": [
+            "Portiamo i cani a passeggiare sulla spiaggia",
+            "La Girandola è uno spettacolo pirotecnico antico",
+            "Oggi a Roma è festa per i Santi Pietro e Paolo",
+            "A Roma oggi fa molto caldo"
+          ],
+          "correctIndex": 0
         }
       ],
-      "passingScore": 1,
+      "passingScore": 5,
       "maxScoreBehavior": "basic"
     }
   },
   {
     "id": "5",
-    "title": "Italian Vlog Series - Part 4",
-    "description": "Fourth episode of an Italian vlog series",
-    "duration": 840,
-    "thumbnail": "https://img.youtube.com/vi/v89xFHmq3SM/maxresdefault.jpg",
-    "src": "https://www.youtube.com/embed/v89xFHmq3SM",
+    "title": "Italian Cooking Video",
+    "description": "Learn Italian through cooking content",
+    "duration": 600,
+    "thumbnail": "https://img.youtube.com/vi/0ipPqza07eM/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/0ipPqza07eM",
     "captions": [
-      { "lang": "it", "url": null }
+      {
+        "lang": "it",
+        "url": null
+      }
     ],
     "quiz": {
-      "instructions": "Answer questions about Italian expressions and culture.",
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
       "questions": [
         {
-          "id": "q1",
-          "prompt": "What does 'come stai?' mean?",
-          "choices": ["How are you?", "What's your name?", "Where are you?", "What time is it?"],
+          "id": "07-01",
+          "prompt": "Translate to Italian: We wait for the leavening with patience.",
+          "choices": [
+            "Aspettiamo la lievitazione con pazienza",
+            "Il pizzaiolo controlla umidità e temperatura",
+            "Mettiamo il condimento sulle pizze",
+            "A Napoli la pizza è soffice e leggera"
+          ],
           "correctIndex": 0
         },
         {
-          "id": "q2",
-          "prompt": "What is the response to 'grazie'?",
-          "choices": ["Prego", "Scusa", "Ciao", "Arrivederci"],
+          "id": "07-02",
+          "prompt": "Translate to Italian: In Naples the pizza is soft and light.",
+          "choices": [
+            "A Napoli la pizza è soffice e leggera",
+            "Cuociamo la pizza nel forno di casa",
+            "Il pizzaiolo controlla umidità e temperatura",
+            "Ungi la teglia prima di mettere l'impasto"
+          ],
           "correctIndex": 0
         },
         {
-          "id": "q3",
-          "prompt": "What does 'buonasera' mean?",
-          "choices": ["Good morning", "Good afternoon", "Good evening", "Good night"],
+          "id": "07-03",
+          "prompt": "Translate to Italian: The pizza maker checks humidity and temperature.",
+          "choices": [
+            "Facciamo due panetti per due teglie",
+            "Il pizzaiolo controlla umidità e temperatura",
+            "Cuociamo la pizza nel forno di casa",
+            "L'impasto deve essere estensibile e morbido"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "07-04",
+          "prompt": "Translate to Italian: The dough must be stretchable and soft.",
+          "choices": [
+            "Prepariamo l'impasto con farina acqua sale e lievito",
+            "Lasciamo l'impasto a riposare per molte ore",
+            "L'impasto deve essere estensibile e morbido",
+            "Facciamo due panetti per due teglie"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "07-05",
+          "prompt": "Translate to Italian: Oil the pan before putting the dough.",
+          "choices": [
+            "Il pizzaiolo controlla umidità e temperatura",
+            "Prepariamo l'impasto con farina acqua sale e lievito",
+            "Ungi la teglia prima di mettere l'impasto",
+            "Lasciamo l'impasto a riposare per molte ore"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "07-06",
+          "prompt": "Translate to Italian: We bake the pizza in the home oven.",
+          "choices": [
+            "Lasciamo l'impasto a riposare per molte ore",
+            "A Napoli la pizza è soffice e leggera",
+            "Il pizzaiolo controlla umidità e temperatura",
+            "Cuociamo la pizza nel forno di casa"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "07-07",
+          "prompt": "Translate to Italian: We make two dough balls for two pans.",
+          "choices": [
+            "Facciamo due panetti per due teglie",
+            "Cuociamo la pizza nel forno di casa",
+            "Prepariamo l'impasto con farina acqua sale e lievito",
+            "Il pizzaiolo controlla umidità e temperatura"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "07-08",
+          "prompt": "Translate to Italian: We leave the dough to rest for many hours.",
+          "choices": [
+            "Il pizzaiolo controlla umidità e temperatura",
+            "Prepariamo l'impasto con farina acqua sale e lievito",
+            "Lasciamo l'impasto a riposare per molte ore",
+            "Mettiamo il condimento sulle pizze"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "07-09",
+          "prompt": "Translate to Italian: We prepare the dough with flour, water, salt and yeast.",
+          "choices": [
+            "Prepariamo l'impasto con farina acqua sale e lievito",
+            "Cuociamo la pizza nel forno di casa",
+            "Lasciamo l'impasto a riposare per molte ore",
+            "L'impasto deve essere estensibile e morbido"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "07-10",
+          "prompt": "Translate to Italian: We put the topping on the pizzas.",
+          "choices": [
+            "Cuociamo la pizza nel forno di casa",
+            "Prepariamo l'impasto con farina acqua sale e lievito",
+            "Mettiamo il condimento sulle pizze",
+            "Ungi la teglia prima di mettere l'impasto"
+          ],
           "correctIndex": 2
         }
       ],
-      "passingScore": 2,
+      "passingScore": 5,
       "maxScoreBehavior": "basic"
     }
   },
   {
     "id": "6",
-    "title": "Italian Lifestyle Vlog",
-    "description": "Exploring Italian culture and traditions",
-    "duration": 660,
-    "thumbnail": "https://img.youtube.com/vi/0GqMNKBih9k/maxresdefault.jpg",
-    "src": "https://www.youtube.com/embed/0GqMNKBih9k",
+    "title": "Italian Cooking Recipe",
+    "description": "Learn Italian through cooking content",
+    "duration": 600,
+    "thumbnail": "https://img.youtube.com/vi/hIS9QwPyvFs/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/hIS9QwPyvFs",
     "captions": [
-      { "lang": "it", "url": null }
+      {
+        "lang": "it",
+        "url": null
+      }
     ],
     "quiz": {
-      "instructions": "Test your knowledge of Italian culture.",
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
       "questions": [
         {
-          "id": "q1",
-          "prompt": "What is Italy's national language?",
-          "choices": ["Spanish", "Italian", "French", "English"],
+          "id": "08-01",
+          "prompt": "Translate to Italian: We put garlic and parsley in the oil.",
+          "choices": [
+            "Facciamo una pasta eccezionale con poco pesce",
+            "Saliamo la pasta con l'acqua di cottura",
+            "Mettiamo aglio e prezzemolo nell'olio",
+            "Aggiungiamo un po' di peperoncino"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "08-02",
+          "prompt": "Translate to Italian: We cut the squid into thin rings.",
+          "choices": [
+            "Butto gli spaghetti e mescolo nella wok",
+            "Tagliamo i calamari a rondelle sottili",
+            "Stappiamo un prosecco ben ghiacciato",
+            "Facciamo una pasta eccezionale con poco pesce"
+          ],
           "correctIndex": 1
         },
         {
-          "id": "q2",
-          "prompt": "What does 'scusa' mean?",
-          "choices": ["Thank you", "Please", "Sorry/Excuse me", "Hello"],
+          "id": "08-03",
+          "prompt": "Translate to Italian: We make an excellent pasta with little fish.",
+          "choices": [
+            "Cuociamo gli spaghetti in otto minuti",
+            "È festa e cuciniamo per la famiglia",
+            "Facciamo una pasta eccezionale con poco pesce",
+            "Butto gli spaghetti e mescolo nella wok"
+          ],
           "correctIndex": 2
+        },
+        {
+          "id": "08-04",
+          "prompt": "Translate to Italian: We cook the spaghetti in eight minutes.",
+          "choices": [
+            "Sbattiamo la pasta per farla cremosa",
+            "Butto gli spaghetti e mescolo nella wok",
+            "Tagliamo i calamari a rondelle sottili",
+            "Cuociamo gli spaghetti in otto minuti"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "08-05",
+          "prompt": "Translate to Italian: We toss the pasta to make it creamy.",
+          "choices": [
+            "Stappiamo un prosecco ben ghiacciato",
+            "Aggiungiamo un po' di peperoncino",
+            "È festa e cuciniamo per la famiglia",
+            "Sbattiamo la pasta per farla cremosa"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "08-06",
+          "prompt": "Translate to Italian: I throw in the spaghetti and mix in the wok.",
+          "choices": [
+            "Mettiamo aglio e prezzemolo nell'olio",
+            "Cuociamo gli spaghetti in otto minuti",
+            "Facciamo una pasta eccezionale con poco pesce",
+            "Butto gli spaghetti e mescolo nella wok"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "08-07",
+          "prompt": "Translate to Italian: We add a little chili pepper.",
+          "choices": [
+            "Aggiungiamo un po' di peperoncino",
+            "Tagliamo i calamari a rondelle sottili",
+            "Stappiamo un prosecco ben ghiacciato",
+            "Butto gli spaghetti e mescolo nella wok"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "08-08",
+          "prompt": "Translate to Italian: We pop a very cold prosecco.",
+          "choices": [
+            "Aggiungiamo un po' di peperoncino",
+            "Sbattiamo la pasta per farla cremosa",
+            "Mettiamo aglio e prezzemolo nell'olio",
+            "Stappiamo un prosecco ben ghiacciato"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "08-09",
+          "prompt": "Translate to Italian: We salt the pasta with the cooking water.",
+          "choices": [
+            "Stappiamo un prosecco ben ghiacciato",
+            "Butto gli spaghetti e mescolo nella wok",
+            "Saliamo la pasta con l'acqua di cottura",
+            "Sbattiamo la pasta per farla cremosa"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "08-10",
+          "prompt": "Translate to Italian: It is a holiday and we cook for the family.",
+          "choices": [
+            "È festa e cuciniamo per la famiglia",
+            "Cuociamo gli spaghetti in otto minuti",
+            "Tagliamo i calamari a rondelle sottili",
+            "Mettiamo aglio e prezzemolo nell'olio"
+          ],
+          "correctIndex": 0
         }
       ],
-      "passingScore": 1,
+      "passingScore": 5,
       "maxScoreBehavior": "basic"
     }
   },
   {
     "id": "7",
-    "title": "Italian Cooking - Traditional Recipe",
-    "description": "Learn to cook authentic Italian dishes",
-    "duration": 1200,
-    "thumbnail": "https://img.youtube.com/vi/0ipPqza07eM/maxresdefault.jpg",
-    "src": "https://www.youtube.com/embed/0ipPqza07eM",
+    "title": "Italian Cooking Tutorial",
+    "description": "Learn Italian through cooking content",
+    "duration": 600,
+    "thumbnail": "https://img.youtube.com/vi/d5veFsTY-OU/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/d5veFsTY-OU",
     "captions": [
-      { "lang": "it", "url": null }
+      {
+        "lang": "it",
+        "url": null
+      }
     ],
     "quiz": {
-      "instructions": "Answer questions about Italian cooking and food vocabulary.",
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
       "questions": [
         {
-          "id": "q1",
-          "prompt": "What does 'pasta' mean in Italian?",
-          "choices": ["Pasta", "Bread", "Rice", "Soup"],
+          "id": "09-01",
+          "prompt": "Translate to Italian: We cook the spaghetti in eight minutes.",
+          "choices": [
+            "Tagliamo i calamari a rondelle sottili",
+            "È festa e cuciniamo per la famiglia",
+            "Saliamo la pasta con l'acqua di cottura",
+            "Cuociamo gli spaghetti in otto minuti"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "09-02",
+          "prompt": "Translate to Italian: We make an excellent pasta with little fish.",
+          "choices": [
+            "Mettiamo aglio e prezzemolo nell'olio",
+            "Facciamo una pasta eccezionale con poco pesce",
+            "Butto gli spaghetti e mescolo nella wok",
+            "Cuociamo gli spaghetti in otto minuti"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "09-03",
+          "prompt": "Translate to Italian: We pop a very cold prosecco.",
+          "choices": [
+            "Stappiamo un prosecco ben ghiacciato",
+            "Sbattiamo la pasta per farla cremosa",
+            "È festa e cuciniamo per la famiglia",
+            "Aggiungiamo un po' di peperoncino"
+          ],
           "correctIndex": 0
         },
         {
-          "id": "q2",
-          "prompt": "What is 'pomodoro'?",
-          "choices": ["Potato", "Tomato", "Pepper", "Onion"],
+          "id": "09-04",
+          "prompt": "Translate to Italian: I throw in the spaghetti and mix in the wok.",
+          "choices": [
+            "Butto gli spaghetti e mescolo nella wok",
+            "Stappiamo un prosecco ben ghiacciato",
+            "È festa e cuciniamo per la famiglia",
+            "Aggiungiamo un po' di peperoncino"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "09-05",
+          "prompt": "Translate to Italian: We put garlic and parsley in the oil.",
+          "choices": [
+            "Stappiamo un prosecco ben ghiacciato",
+            "Mettiamo aglio e prezzemolo nell'olio",
+            "Sbattiamo la pasta per farla cremosa",
+            "Aggiungiamo un po' di peperoncino"
+          ],
           "correctIndex": 1
         },
         {
-          "id": "q3",
-          "prompt": "What does 'al dente' mean?",
-          "choices": ["Overcooked", "Firm to the bite", "Raw", "Soft"],
-          "correctIndex": 1
+          "id": "09-06",
+          "prompt": "Translate to Italian: We salt the pasta with the cooking water.",
+          "choices": [
+            "Butto gli spaghetti e mescolo nella wok",
+            "Mettiamo aglio e prezzemolo nell'olio",
+            "Aggiungiamo un po' di peperoncino",
+            "Saliamo la pasta con l'acqua di cottura"
+          ],
+          "correctIndex": 3
         },
         {
-          "id": "q4",
-          "prompt": "What is 'olio d'oliva'?",
-          "choices": ["Butter", "Olive oil", "Vegetable oil", "Coconut oil"],
+          "id": "09-07",
+          "prompt": "Translate to Italian: We cut the squid into thin rings.",
+          "choices": [
+            "Aggiungiamo un po' di peperoncino",
+            "Saliamo la pasta con l'acqua di cottura",
+            "Tagliamo i calamari a rondelle sottili",
+            "Mettiamo aglio e prezzemolo nell'olio"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "09-08",
+          "prompt": "Translate to Italian: We toss the pasta to make it creamy.",
+          "choices": [
+            "Sbattiamo la pasta per farla cremosa",
+            "Aggiungiamo un po' di peperoncino",
+            "Cuociamo gli spaghetti in otto minuti",
+            "È festa e cuciniamo per la famiglia"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "09-09",
+          "prompt": "Translate to Italian: It is a holiday and we cook for the family.",
+          "choices": [
+            "Aggiungiamo un po' di peperoncino",
+            "Mettiamo aglio e prezzemolo nell'olio",
+            "È festa e cuciniamo per la famiglia",
+            "Cuociamo gli spaghetti in otto minuti"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "09-10",
+          "prompt": "Translate to Italian: We add a little chili pepper.",
+          "choices": [
+            "Facciamo una pasta eccezionale con poco pesce",
+            "Aggiungiamo un po' di peperoncino",
+            "Tagliamo i calamari a rondelle sottili",
+            "Stappiamo un prosecco ben ghiacciato"
+          ],
           "correctIndex": 1
         }
       ],
-      "passingScore": 3,
+      "passingScore": 5,
       "maxScoreBehavior": "basic"
     }
   },
   {
     "id": "8",
-    "title": "Italian Cooking - Advanced Techniques",
-    "description": "Master advanced Italian cooking techniques",
-    "duration": 1500,
-    "thumbnail": "https://img.youtube.com/vi/hIS9QwPyvFs/maxresdefault.jpg",
-    "src": "https://www.youtube.com/embed/hIS9QwPyvFs",
+    "title": "Italian Cooking Show",
+    "description": "Learn Italian through cooking content",
+    "duration": 600,
+    "thumbnail": "https://img.youtube.com/vi/zXZq6crD6WI/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/zXZq6crD6WI",
     "captions": [
-      { "lang": "it", "url": null }
+      {
+        "lang": "it",
+        "url": null
+      }
     ],
     "quiz": {
-      "instructions": "Test your knowledge of Italian cooking terms.",
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
       "questions": [
         {
-          "id": "q1",
-          "prompt": "What does 'formaggio' mean?",
-          "choices": ["Cheese", "Flour", "Sugar", "Salt"],
+          "id": "10-01",
+          "prompt": "Translate to Italian: It cooks slowly for several hours.",
+          "choices": [
+            "Sbollentiamo i fogli di pasta per un minuto",
+            "Aggiungiamo vino e pomodoro al ragù",
+            "La lasagna è un piatto della tradizione",
+            "Cuoce lentamente per alcune ore"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "10-02",
+          "prompt": "Translate to Italian: We roll the fresh pasta very thin.",
+          "choices": [
+            "Tiriamo la pasta fresca molto sottile",
+            "Usiamo un vino amato da Giuseppe Verdi",
+            "Aggiungiamo vino e pomodoro al ragù",
+            "Facciamo una besciamella liscia e profumata"
+          ],
           "correctIndex": 0
         },
         {
-          "id": "q2",
-          "prompt": "What is 'aglio'?",
-          "choices": ["Onion", "Garlic", "Basil", "Oregano"],
+          "id": "10-03",
+          "prompt": "Translate to Italian: We add wine and tomato to the ragù.",
+          "choices": [
+            "Facciamo una besciamella liscia e profumata",
+            "Aggiungiamo vino e pomodoro al ragù",
+            "La lasagna è un piatto della tradizione",
+            "Tiriamo la pasta fresca molto sottile"
+          ],
           "correctIndex": 1
         },
         {
-          "id": "q3",
-          "prompt": "What does 'sale' mean?",
-          "choices": ["Sugar", "Salt", "Pepper", "Vinegar"],
+          "id": "10-04",
+          "prompt": "Translate to Italian: We make a smooth and fragrant béchamel.",
+          "choices": [
+            "Facciamo una besciamella liscia e profumata",
+            "Usiamo un vino amato da Giuseppe Verdi",
+            "La lasagna è un piatto della tradizione",
+            "Cuoce lentamente per alcune ore"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "10-05",
+          "prompt": "Translate to Italian: Lasagna is a dish of the tradition.",
+          "choices": [
+            "La lasagna è un piatto della tradizione",
+            "Cuoce lentamente per alcune ore",
+            "Tiriamo la pasta fresca molto sottile",
+            "Usiamo un vino amato da Giuseppe Verdi"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "10-06",
+          "prompt": "Translate to Italian: We prepare a ragù with carrots, celery and onion.",
+          "choices": [
+            "Prepariamo un ragù con carote sedano e cipolla",
+            "La lasagna è un piatto della tradizione",
+            "Aggiungiamo vino e pomodoro al ragù",
+            "Cuoce lentamente per alcune ore"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "10-07",
+          "prompt": "Translate to Italian: We use a wine loved by Giuseppe Verdi.",
+          "choices": [
+            "Cuoce lentamente per alcune ore",
+            "Sbollentiamo i fogli di pasta per un minuto",
+            "Usiamo un vino amato da Giuseppe Verdi",
+            "Prepariamo un ragù con carote sedano e cipolla"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "10-08",
+          "prompt": "Translate to Italian: We salt a little and mix well.",
+          "choices": [
+            "Facciamo una besciamella liscia e profumata",
+            "Saliamo poco e mescoliamo bene",
+            "Montiamo la lasagna a strati nella pirofila",
+            "Aggiungiamo vino e pomodoro al ragù"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "10-09",
+          "prompt": "Translate to Italian: We assemble the lasagna in layers in the dish.",
+          "choices": [
+            "La lasagna è un piatto della tradizione",
+            "Montiamo la lasagna a strati nella pirofila",
+            "Tiriamo la pasta fresca molto sottile",
+            "Usiamo un vino amato da Giuseppe Verdi"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "10-10",
+          "prompt": "Translate to Italian: We blanch the pasta sheets for a minute.",
+          "choices": [
+            "Aggiungiamo vino e pomodoro al ragù",
+            "Sbollentiamo i fogli di pasta per un minuto",
+            "La lasagna è un piatto della tradizione",
+            "Tiriamo la pasta fresca molto sottile"
+          ],
           "correctIndex": 1
         }
       ],
-      "passingScore": 2,
+      "passingScore": 5,
       "maxScoreBehavior": "basic"
     }
   },
   {
     "id": "9",
-    "title": "Italian Cooking - Regional Specialties",
-    "description": "Discover regional Italian cooking specialties",
-    "duration": 1080,
+    "title": "Italian Movie Trailer",
+    "description": "Learn Italian through movies and trailers content",
+    "duration": 600,
     "thumbnail": "https://img.youtube.com/vi/d5veFsTY-OU/maxresdefault.jpg",
     "src": "https://www.youtube.com/embed/d5veFsTY-OU",
     "captions": [
-      { "lang": "it", "url": null }
+      {
+        "lang": "it",
+        "url": null
+      }
     ],
     "quiz": {
-      "instructions": "Answer questions about Italian regional cuisine.",
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
       "questions": [
         {
-          "id": "q1",
-          "prompt": "What does 'pizza' mean?",
-          "choices": ["Pasta", "Pizza", "Bread", "Cake"],
-          "correctIndex": 1
+          "id": "17-01",
+          "prompt": "Translate to Italian: The potholes in the streets make people laugh and get angry.",
+          "choices": [
+            "In periferia trovi bar e famiglie al parco",
+            "Roma ha poche grattacieli nel centro storico",
+            "I Parioli sono un quartiere di Roma nord",
+            "Le buche nelle strade fanno ridere e arrabbiare"
+          ],
+          "correctIndex": 3
         },
         {
-          "id": "q2",
-          "prompt": "What is 'gelato'?",
-          "choices": ["Ice cream", "Cake", "Cookie", "Candy"],
+          "id": "17-02",
+          "prompt": "Translate to Italian: Citizens and tourists live different realities.",
+          "choices": [
+            "All'Eur c'è un grattacielo molto alto",
+            "Dal Gianicolo si vede la cupola di San Pietro",
+            "Roma nord è più benestante di Roma sud",
+            "I cittadini e i turisti vivono realtà diverse"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "17-03",
+          "prompt": "Translate to Italian: North Rome is wealthier than south Rome.",
+          "choices": [
+            "Roma nord è più benestante di Roma sud",
+            "In periferia trovi bar e famiglie al parco",
+            "Dal Gianicolo si vede la cupola di San Pietro",
+            "I Parioli sono un quartiere di Roma nord"
+          ],
           "correctIndex": 0
         },
         {
-          "id": "q3",
-          "prompt": "What does 'pane' mean?",
-          "choices": ["Water", "Bread", "Meat", "Fish"],
+          "id": "17-04",
+          "prompt": "Translate to Italian: Rome is a complex and beautiful city.",
+          "choices": [
+            "All'Eur c'è un grattacielo molto alto",
+            "Roma è una città complessa e bellissima",
+            "Dal Gianicolo si vede la cupola di San Pietro",
+            "I Parioli sono un quartiere di Roma nord"
+          ],
           "correctIndex": 1
         },
         {
-          "id": "q4",
-          "prompt": "What is 'acqua'?",
-          "choices": ["Wine", "Water", "Milk", "Juice"],
+          "id": "17-05",
+          "prompt": "Translate to Italian: In the suburbs you find bars and families at the park.",
+          "choices": [
+            "In periferia trovi bar e famiglie al parco",
+            "Roma nord è più benestante di Roma sud",
+            "I Parioli sono un quartiere di Roma nord",
+            "Molti romani vivono fuori dal centro"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "17-06",
+          "prompt": "Translate to Italian: In Eur there is a very tall skyscraper.",
+          "choices": [
+            "I cittadini e i turisti vivono realtà diverse",
+            "In periferia trovi bar e famiglie al parco",
+            "All'Eur c'è un grattacielo molto alto",
+            "Le buche nelle strade fanno ridere e arrabbiare"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "17-07",
+          "prompt": "Translate to Italian: Parioli is a neighborhood in north Rome.",
+          "choices": [
+            "All'Eur c'è un grattacielo molto alto",
+            "I cittadini e i turisti vivono realtà diverse",
+            "I Parioli sono un quartiere di Roma nord",
+            "Molti romani vivono fuori dal centro"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "17-08",
+          "prompt": "Translate to Italian: Many Romans live outside the center.",
+          "choices": [
+            "Molti romani vivono fuori dal centro",
+            "Roma nord è più benestante di Roma sud",
+            "All'Eur c'è un grattacielo molto alto",
+            "I cittadini e i turisti vivono realtà diverse"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "17-09",
+          "prompt": "Translate to Italian: From the Janiculum you can see Saint Peter's dome.",
+          "choices": [
+            "Dal Gianicolo si vede la cupola di San Pietro",
+            "Roma ha poche grattacieli nel centro storico",
+            "I cittadini e i turisti vivono realtà diverse",
+            "In periferia trovi bar e famiglie al parco"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "17-10",
+          "prompt": "Translate to Italian: Rome has few skyscrapers in the historic center.",
+          "choices": [
+            "Le buche nelle strade fanno ridere e arrabbiare",
+            "Roma ha poche grattacieli nel centro storico",
+            "Roma è una città complessa e bellissima",
+            "I cittadini e i turisti vivono realtà diverse"
+          ],
           "correctIndex": 1
         }
       ],
-      "passingScore": 3,
+      "passingScore": 5,
       "maxScoreBehavior": "basic"
     }
   },
   {
     "id": "10",
-    "title": "Italian Cooking - Classic Dish",
-    "description": "Learn to prepare a classic Italian dish",
-    "duration": 960,
-    "thumbnail": "https://img.youtube.com/vi/zXZq6crD6WI/maxresdefault.jpg",
-    "src": "https://www.youtube.com/embed/zXZq6crD6WI",
+    "title": "Italian Film Trailer",
+    "description": "Learn Italian through movies and trailers content",
+    "duration": 600,
+    "thumbnail": "https://img.youtube.com/vi/hl1TK_tDMao/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/hl1TK_tDMao",
     "captions": [
-      { "lang": "it", "url": null }
+      {
+        "lang": "it",
+        "url": null
+      }
     ],
     "quiz": {
-      "instructions": "Test your Italian food vocabulary.",
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
       "questions": [
         {
-          "id": "q1",
-          "prompt": "What does 'carne' mean?",
-          "choices": ["Chicken", "Meat", "Fish", "Vegetable"],
+          "id": "18-01",
+          "prompt": "Translate to Italian: We toss the pasta to make it creamy.",
+          "choices": [
+            "Facciamo una pasta eccezionale con poco pesce",
+            "Mettiamo aglio e prezzemolo nell'olio",
+            "Aggiungiamo un po' di peperoncino",
+            "Sbattiamo la pasta per farla cremosa"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "18-02",
+          "prompt": "Translate to Italian: We make an excellent pasta with little fish.",
+          "choices": [
+            "Mettiamo aglio e prezzemolo nell'olio",
+            "Sbattiamo la pasta per farla cremosa",
+            "Facciamo una pasta eccezionale con poco pesce",
+            "Saliamo la pasta con l'acqua di cottura"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "18-03",
+          "prompt": "Translate to Italian: It is a holiday and we cook for the family.",
+          "choices": [
+            "Stappiamo un prosecco ben ghiacciato",
+            "Sbattiamo la pasta per farla cremosa",
+            "È festa e cuciniamo per la famiglia",
+            "Cuociamo gli spaghetti in otto minuti"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "18-04",
+          "prompt": "Translate to Italian: We put garlic and parsley in the oil.",
+          "choices": [
+            "Cuociamo gli spaghetti in otto minuti",
+            "Facciamo una pasta eccezionale con poco pesce",
+            "Sbattiamo la pasta per farla cremosa",
+            "Mettiamo aglio e prezzemolo nell'olio"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "18-05",
+          "prompt": "Translate to Italian: We cook the spaghetti in eight minutes.",
+          "choices": [
+            "Cuociamo gli spaghetti in otto minuti",
+            "Saliamo la pasta con l'acqua di cottura",
+            "Stappiamo un prosecco ben ghiacciato",
+            "Mettiamo aglio e prezzemolo nell'olio"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "18-06",
+          "prompt": "Translate to Italian: We cut the squid into thin rings.",
+          "choices": [
+            "Tagliamo i calamari a rondelle sottili",
+            "Sbattiamo la pasta per farla cremosa",
+            "Butto gli spaghetti e mescolo nella wok",
+            "Aggiungiamo un po' di peperoncino"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "18-07",
+          "prompt": "Translate to Italian: We salt the pasta with the cooking water.",
+          "choices": [
+            "Aggiungiamo un po' di peperoncino",
+            "Mettiamo aglio e prezzemolo nell'olio",
+            "Saliamo la pasta con l'acqua di cottura",
+            "Facciamo una pasta eccezionale con poco pesce"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "18-08",
+          "prompt": "Translate to Italian: I throw in the spaghetti and mix in the wok.",
+          "choices": [
+            "Tagliamo i calamari a rondelle sottili",
+            "Cuociamo gli spaghetti in otto minuti",
+            "Butto gli spaghetti e mescolo nella wok",
+            "Facciamo una pasta eccezionale con poco pesce"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "18-09",
+          "prompt": "Translate to Italian: We add a little chili pepper.",
+          "choices": [
+            "Facciamo una pasta eccezionale con poco pesce",
+            "Cuociamo gli spaghetti in otto minuti",
+            "Aggiungiamo un po' di peperoncino",
+            "Butto gli spaghetti e mescolo nella wok"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "18-10",
+          "prompt": "Translate to Italian: We pop a very cold prosecco.",
+          "choices": [
+            "Facciamo una pasta eccezionale con poco pesce",
+            "Cuociamo gli spaghetti in otto minuti",
+            "Stappiamo un prosecco ben ghiacciato",
+            "Aggiungiamo un po' di peperoncino"
+          ],
+          "correctIndex": 2
+        }
+      ],
+      "passingScore": 5,
+      "maxScoreBehavior": "basic"
+    }
+  },
+  {
+    "id": "11",
+    "title": "Italian Cinema Trailer",
+    "description": "Learn Italian through movies and trailers content",
+    "duration": 600,
+    "thumbnail": "https://img.youtube.com/vi/R9Q-WpxxATs/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/R9Q-WpxxATs",
+    "captions": [
+      {
+        "lang": "it",
+        "url": null
+      }
+    ],
+    "quiz": {
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
+      "questions": [
+        {
+          "id": "19-01",
+          "prompt": "Translate to Italian: In the afternoon I have an online Portuguese lesson.",
+          "choices": [
+            "Mi sento felice quando lavoro con la creatività",
+            "Nel pomeriggio faccio lezione di portoghese online",
+            "Dopo il corso passeggio vicino a San Pietro",
+            "Modello una tazza con la tecnica a lastra"
+          ],
           "correctIndex": 1
         },
         {
-          "id": "q2",
-          "prompt": "What is 'pesce'?",
-          "choices": ["Meat", "Fish", "Chicken", "Beef"],
+          "id": "19-02",
+          "prompt": "Translate to Italian: I study languages by listening, reading and speaking.",
+          "choices": [
+            "Studio le lingue ascoltando leggendo e parlando",
+            "Nel pomeriggio faccio lezione di portoghese online",
+            "Modello una tazza con la tecnica a lastra",
+            "A Roma oggi c'è tanta gente in piazza"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "19-03",
+          "prompt": "Translate to Italian: I shape a cup with the slab technique.",
+          "choices": [
+            "Mi sento felice quando lavoro con la creatività",
+            "Mi alzo presto per un workshop di ceramica",
+            "Ringrazio chi mi segue sul canale e su Instagram",
+            "Modello una tazza con la tecnica a lastra"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "19-04",
+          "prompt": "Translate to Italian: I write good morning on my new cup.",
+          "choices": [
+            "A Roma oggi c'è tanta gente in piazza",
+            "Scrivo buongiorno sulla mia nuova tazza",
+            "Nel pomeriggio faccio lezione di portoghese online",
+            "Dopo il corso passeggio vicino a San Pietro"
+          ],
           "correctIndex": 1
         },
         {
-          "id": "q3",
-          "prompt": "What does 'verdura' mean?",
-          "choices": ["Fruit", "Vegetable", "Meat", "Bread"],
+          "id": "19-05",
+          "prompt": "Translate to Italian: I get up early for a ceramics workshop.",
+          "choices": [
+            "Ringrazio chi mi segue sul canale e su Instagram",
+            "Modello una tazza con la tecnica a lastra",
+            "Nel pomeriggio faccio lezione di portoghese online",
+            "Mi alzo presto per un workshop di ceramica"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "19-06",
+          "prompt": "Translate to Italian: I thank those who follow me on the channel and on Instagram.",
+          "choices": [
+            "A Roma oggi c'è tanta gente in piazza",
+            "Dopo il corso passeggio vicino a San Pietro",
+            "Ringrazio chi mi segue sul canale e su Instagram",
+            "Scrivo buongiorno sulla mia nuova tazza"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "19-07",
+          "prompt": "Translate to Italian: I feel happy when I work with creativity.",
+          "choices": [
+            "Mi sento felice quando lavoro con la creatività",
+            "A Roma oggi c'è tanta gente in piazza",
+            "Modello una tazza con la tecnica a lastra",
+            "Mi alzo presto per un workshop di ceramica"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "19-08",
+          "prompt": "Translate to Italian: Today in Rome there are many people in the square.",
+          "choices": [
+            "Mi alzo presto per un workshop di ceramica",
+            "Studio le lingue ascoltando leggendo e parlando",
+            "A Roma oggi c'è tanta gente in piazza",
+            "Dopo il corso passeggio vicino a San Pietro"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "19-09",
+          "prompt": "Translate to Italian: After the class I walk near Saint Peter's.",
+          "choices": [
+            "Modello una tazza con la tecnica a lastra",
+            "Dopo il corso passeggio vicino a San Pietro",
+            "Mi alzo presto per un workshop di ceramica",
+            "Scrivo buongiorno sulla mia nuova tazza"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "19-10",
+          "prompt": "Translate to Italian: I prepare a study plan for Portuguese.",
+          "choices": [
+            "Ringrazio chi mi segue sul canale e su Instagram",
+            "Preparo un piano di studio per il portoghese",
+            "Studio le lingue ascoltando leggendo e parlando",
+            "Scrivo buongiorno sulla mia nuova tazza"
+          ],
           "correctIndex": 1
         }
       ],
-      "passingScore": 2,
+      "passingScore": 5,
+      "maxScoreBehavior": "basic"
+    }
+  },
+  {
+    "id": "12",
+    "title": "Italian Movie Preview",
+    "description": "Learn Italian through movies and trailers content",
+    "duration": 600,
+    "thumbnail": "https://img.youtube.com/vi/eGpma5EICv4/maxresdefault.jpg",
+    "src": "https://www.youtube.com/embed/eGpma5EICv4",
+    "captions": [
+      {
+        "lang": "it",
+        "url": null
+      }
+    ],
+    "quiz": {
+      "instructions": "Translate the English sentences to Italian. Choose the correct Italian translation.",
+      "questions": [
+        {
+          "id": "20-01",
+          "prompt": "Translate to Italian: Rome is a complex and beautiful city.",
+          "choices": [
+            "Roma nord è più benestante di Roma sud",
+            "I Parioli sono un quartiere di Roma nord",
+            "Roma è una città complessa e bellissima",
+            "Le buche nelle strade fanno ridere e arrabbiare"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "20-02",
+          "prompt": "Translate to Italian: Rome has few skyscrapers in the historic center.",
+          "choices": [
+            "Roma ha poche grattacieli nel centro storico",
+            "I cittadini e i turisti vivono realtà diverse",
+            "Le buche nelle strade fanno ridere e arrabbiare",
+            "Dal Gianicolo si vede la cupola di San Pietro"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "20-03",
+          "prompt": "Translate to Italian: Parioli is a neighborhood in north Rome.",
+          "choices": [
+            "Roma è una città complessa e bellissima",
+            "I Parioli sono un quartiere di Roma nord",
+            "Le buche nelle strade fanno ridere e arrabbiare",
+            "Roma ha poche grattacieli nel centro storico"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "20-04",
+          "prompt": "Translate to Italian: North Rome is wealthier than south Rome.",
+          "choices": [
+            "I cittadini e i turisti vivono realtà diverse",
+            "Roma è una città complessa e bellissima",
+            "Dal Gianicolo si vede la cupola di San Pietro",
+            "Roma nord è più benestante di Roma sud"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "20-05",
+          "prompt": "Translate to Italian: In Eur there is a very tall skyscraper.",
+          "choices": [
+            "Roma è una città complessa e bellissima",
+            "Molti romani vivono fuori dal centro",
+            "All'Eur c'è un grattacielo molto alto",
+            "I Parioli sono un quartiere di Roma nord"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "20-06",
+          "prompt": "Translate to Italian: In the suburbs you find bars and families at the park.",
+          "choices": [
+            "All'Eur c'è un grattacielo molto alto",
+            "Roma ha poche grattacieli nel centro storico",
+            "In periferia trovi bar e famiglie al parco",
+            "Molti romani vivono fuori dal centro"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "id": "20-07",
+          "prompt": "Translate to Italian: The potholes in the streets make people laugh and get angry.",
+          "choices": [
+            "Molti romani vivono fuori dal centro",
+            "Roma nord è più benestante di Roma sud",
+            "Roma ha poche grattacieli nel centro storico",
+            "Le buche nelle strade fanno ridere e arrabbiare"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "id": "20-08",
+          "prompt": "Translate to Italian: Citizens and tourists live different realities.",
+          "choices": [
+            "I cittadini e i turisti vivono realtà diverse",
+            "Molti romani vivono fuori dal centro",
+            "In periferia trovi bar e famiglie al parco",
+            "Roma è una città complessa e bellissima"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "20-09",
+          "prompt": "Translate to Italian: Many Romans live outside the center.",
+          "choices": [
+            "In periferia trovi bar e famiglie al parco",
+            "Molti romani vivono fuori dal centro",
+            "Roma è una città complessa e bellissima",
+            "All'Eur c'è un grattacielo molto alto"
+          ],
+          "correctIndex": 1
+        },
+        {
+          "id": "20-10",
+          "prompt": "Translate to Italian: From the Janiculum you can see Saint Peter's dome.",
+          "choices": [
+            "In periferia trovi bar e famiglie al parco",
+            "Dal Gianicolo si vede la cupola di San Pietro",
+            "I cittadini e i turisti vivono realtà diverse",
+            "Roma ha poche grattacieli nel centro storico"
+          ],
+          "correctIndex": 1
+        }
+      ],
+      "passingScore": 5,
       "maxScoreBehavior": "basic"
     }
   }

@@ -16,16 +16,19 @@ export function Login() {
     setError('');
     setIsLoading(true);
 
-    // Small delay for better UX
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    const success = login(username, password);
-    
-    if (success) {
-      navigate('/');
-    } else {
-      setError('Invalid username or password');
+    try {
+      const success = await login(username, password);
+      
+      if (success) {
+        navigate('/');
+      } else {
+        setError('Invalid username or password');
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setError('Login failed. Please try again.');
       setIsLoading(false);
+      console.error('Login error:', err);
     }
   };
 
@@ -79,7 +82,7 @@ export function Login() {
 
         <div className="login-footer">
           <p className="login-help-text">
-            Demo accounts available: Aral, Kabir, Luca
+            Demo accounts available: Aral, Kabir, Luca, Test, Nikhil
           </p>
         </div>
       </div>
