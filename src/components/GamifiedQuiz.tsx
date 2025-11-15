@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useStopwatch } from '../hooks/useStopwatch';
+import { useAuth } from '../contexts/AuthContext';
+import { getCharacterImage, type CharacterEmotion } from '../utils/characterAvatar';
 import type { Quiz, QuizQuestion } from './QuizModal';
 import './GamifiedQuiz.css';
 
@@ -22,6 +24,7 @@ export function GamifiedQuiz({
   userId,
   onHeartsUpdate,
 }: GamifiedQuizProps) {
+  const { username } = useAuth();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [availableWords, setAvailableWords] = useState<string[]>([]);
@@ -32,6 +35,7 @@ export function GamifiedQuiz({
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
   const [xpGained, setXpGained] = useState<number>(0);
   const [currentHearts, setCurrentHearts] = useState<number>(20);
+  const [characterEmotion, setCharacterEmotion] = useState<CharacterEmotion>('neutral');
   const questionStopwatch = useStopwatch();
   const quizStartTimeRef = useRef<number | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -86,6 +90,7 @@ export function GamifiedQuiz({
       setShowFeedback(false);
       setLastAnswerCorrect(null);
       setXpGained(0);
+      setCharacterEmotion('neutral');
       questionStopwatch.start();
     }
   }, [currentQuestionIndex, quizStarted, quiz.questions]);
@@ -99,6 +104,7 @@ export function GamifiedQuiz({
   const handleStartQuiz = () => {
     setQuizStarted(true);
     setCurrentQuestionIndex(0);
+    setCharacterEmotion('neutral');
     questionStopwatch.start();
   };
 
@@ -135,8 +141,10 @@ export function GamifiedQuiz({
     // Calculate XP for this question (for display) - +5 per correct answer
     if (isCorrect) {
       setXpGained(5); // +5 XP per correct answer
+      setCharacterEmotion('happy');
     } else {
       setXpGained(0);
+      setCharacterEmotion('sad');
       // Deduct heart immediately for wrong answer
       if (userId) {
         const deductHeart = async () => {
@@ -297,6 +305,15 @@ export function GamifiedQuiz({
               Hide
             </button>
           </div>
+        </div>
+
+        {/* Character Display */}
+        <div className={`gamified-quiz-character character-emotion-${characterEmotion}`}>
+          <img 
+            src={getCharacterImage(username, characterEmotion)} 
+            alt={`${username}'s character`}
+            className="quiz-character-image"
+          />
         </div>
         
         <div className="gamified-quiz-question">

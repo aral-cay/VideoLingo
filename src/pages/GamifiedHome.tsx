@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { getCharacterImage } from '../utils/characterAvatar';
 import './GamifiedHome.css';
 
 interface GamificationData {
@@ -214,21 +215,11 @@ export function GamifiedHome() {
         <div className="gamified-center">
           <div className="character-container">
             <div className="character-avatar">
-              {/* Helmet/Head */}
-              <div className="character-helmet">
-                <div className="helmet-visor"></div>
-                <div className="helmet-detail"></div>
-              </div>
-              {/* Body/Torso */}
-              <div className="character-body">
-                <div className="body-armor"></div>
-                <div className="body-core"></div>
-              </div>
-              {/* Accessories */}
-              <div className="character-accessories">
-                <div className="accessory-left"></div>
-                <div className="accessory-right"></div>
-              </div>
+              <img 
+                src={getCharacterImage(username, 'standing')} 
+                alt={`${username}'s character`}
+                className="character-image"
+              />
             </div>
           </div>
         </div>
