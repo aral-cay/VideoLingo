@@ -13,14 +13,14 @@ export interface GamificationData {
 }
 
 /**
- * Get user gamification data
+ * Get participant gamification data
  */
-export async function getGamificationData(userId: string): Promise<GamificationData | null> {
+export async function getGamificationData(participantId: string): Promise<GamificationData | null> {
   try {
     const { data, error } = await supabase
       .from('user_gamification')
       .select('xp, hearts, streak_days, last_activity_date')
-      .eq('user_id', userId)
+      .eq('participant_id', participantId)
       .single();
 
     if (error && error.code !== 'PGRST116') {
@@ -45,16 +45,16 @@ export async function getGamificationData(userId: string): Promise<GamificationD
 }
 
 /**
- * Update user gamification data
+ * Update participant gamification data
  */
 export async function updateGamificationData(
-  userId: string,
+  participantId: string,
   updates: Partial<GamificationData>
 ): Promise<void> {
   try {
     // Map camelCase to snake_case for database
     const dbUpdates: any = {
-      user_id: userId,
+      participant_id: participantId,
       updated_at: new Date().toISOString(),
     };
     
@@ -66,7 +66,7 @@ export async function updateGamificationData(
     const { error } = await supabase
       .from('user_gamification')
       .upsert(dbUpdates, {
-        onConflict: 'user_id',
+        onConflict: 'participant_id',
       });
 
     if (error) {
@@ -80,12 +80,12 @@ export async function updateGamificationData(
 }
 
 /**
- * Add XP to user
+ * Add XP to participant
  */
-export async function addXP(userId: string, amount: number): Promise<void> {
-  const current = await getGamificationData(userId);
+export async function addXP(participantId: string, amount: number): Promise<void> {
+  const current = await getGamificationData(participantId);
   if (current) {
-    await updateGamificationData(userId, {
+    await updateGamificationData(participantId, {
       xp: current.xp + amount,
     });
   }
@@ -94,15 +94,15 @@ export async function addXP(userId: string, amount: number): Promise<void> {
 /**
  * Reset daily hearts to 20
  */
-export async function resetDailyHearts(userId: string): Promise<void> {
-  await updateGamificationData(userId, { hearts: 20 });
+export async function resetDailyHearts(participantId: string): Promise<void> {
+  await updateGamificationData(participantId, { hearts: 20 });
 }
 
 /**
  * Update hearts (lives)
  */
-export async function updateHearts(userId: string, hearts: number): Promise<void> {
-  await updateGamificationData(userId, { hearts });
+export async function updateHearts(participantId: string, hearts: number): Promise<void> {
+  await updateGamificationData(participantId, { hearts });
 }
 
 /**
@@ -140,13 +140,13 @@ export function calculateXP(correct: number, total: number): number {
 /**
  * Save video stars
  */
-export async function saveVideoStars(userId: string, videoId: string, stars: number): Promise<void> {
+export async function saveVideoStars(participantId: string, videoId: string, stars: number): Promise<void> {
   try {
     // Get current progress
     const { data: progressData, error: progressError } = await supabase
       .from('user_progress')
       .select('video_stars')
-      .eq('user_id', userId)
+      .eq('participant_id', participantId)
       .single();
 
     if (progressError && progressError.code !== 'PGRST116') {
@@ -167,7 +167,7 @@ export async function saveVideoStars(userId: string, videoId: string, stars: num
           video_stars: currentStars,
           updated_at: new Date().toISOString(),
         })
-        .eq('user_id', userId);
+        .eq('participant_id', participantId);
 
       if (error) {
         console.error('Error saving video stars:', error);
@@ -216,13 +216,13 @@ function shouldResetHearts(lastResetDate: string | null): boolean {
 /**
  * Check and reset daily hearts at 11:59 PM EST
  */
-export async function checkAndResetDailyHearts(userId: string): Promise<void> {
-  const current = await getGamificationData(userId);
+export async function checkAndResetDailyHearts(participantId: string): Promise<void> {
+  const current = await getGamificationData(participantId);
   if (!current) return;
 
   // Check if we need to reset hearts (new day in EST after 11:59 PM)
   if (shouldResetHearts(current.lastActivityDate)) {
-    await updateGamificationData(userId, { hearts: 20 });
+    await updateGamificationData(participantId, { hearts: 20 });
   }
 }
 
@@ -230,11 +230,11 @@ export async function checkAndResetDailyHearts(userId: string): Promise<void> {
  * Update streak - called when user logs in or completes activity
  * Checks if user logged in today (EST timezone)
  */
-export async function updateStreak(userId: string): Promise<void> {
-  const current = await getGamificationData(userId);
+export async function updateStreak(participantId: string): Promise<void> {
+  const current = await getGamificationData(participantId);
   if (!current) {
     // If no gamification data exists, create it with streak 1
-    await updateGamificationData(userId, {
+    await updateGamificationData(participantId, {
       streakDays: 1,
       lastActivityDate: getESTDate(),
       hearts: 20,
@@ -276,7 +276,7 @@ export async function updateStreak(userId: string): Promise<void> {
     }
   }
 
-  await updateGamificationData(userId, {
+  await updateGamificationData(participantId, {
     streakDays: newStreak,
     lastActivityDate: todayEST,
   });
@@ -286,26 +286,26 @@ export async function updateStreak(userId: string): Promise<void> {
  * Check and update streak on login
  * This should be called when user logs in to track daily login streak
  */
-export async function checkStreakOnLogin(userId: string): Promise<void> {
+export async function checkStreakOnLogin(participantId: string): Promise<void> {
   // First check and reset hearts for new day
-  await checkAndResetDailyHearts(userId);
+  await checkAndResetDailyHearts(participantId);
   
   // Then update streak based on login
-  await updateStreak(userId);
+  await updateStreak(participantId);
 }
 
 /**
- * Check if user can play (has hearts remaining)
+ * Check if participant can play (has hearts remaining)
  */
-export async function canUserPlay(userId: string): Promise<boolean> {
-  const current = await getGamificationData(userId);
+export async function canUserPlay(participantId: string): Promise<boolean> {
+  const current = await getGamificationData(participantId);
   if (!current) return true; // Default to allowing play if no data
   
   // Check and reset hearts if new day
-  await checkAndResetDailyHearts(userId);
+  await checkAndResetDailyHearts(participantId);
   
   // Get updated data
-  const updated = await getGamificationData(userId);
+  const updated = await getGamificationData(participantId);
   return (updated?.hearts || 0) > 0;
 }
 

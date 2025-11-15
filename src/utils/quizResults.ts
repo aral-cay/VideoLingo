@@ -16,12 +16,12 @@ export interface QuizResult {
 /**
  * Save quiz results to Supabase
  */
-export async function saveQuizResult(userId: string, result: QuizResult): Promise<void> {
+export async function saveQuizResult(participantId: string, result: QuizResult): Promise<void> {
   try {
     const { error } = await supabase
       .from('quiz_results')
       .insert({
-        user_id: userId,
+        participant_id: participantId,
         video_id: result.videoId,
         correct_count: result.correctCount,
         incorrect_count: result.incorrectCount,

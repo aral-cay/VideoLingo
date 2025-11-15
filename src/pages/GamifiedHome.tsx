@@ -14,11 +14,11 @@ interface GamificationData {
 interface LeaderboardEntry {
   username: string;
   xp: number;
-  userId: string;
+  participantId: string;
 }
 
 export function GamifiedHome() {
-  const { userId, username, logout } = useAuth();
+  const { participantId, username, condition, logout } = useAuth();
   const navigate = useNavigate();
   const [gamification, setGamification] = useState<GamificationData>({
     xp: 0,
@@ -26,23 +26,25 @@ export function GamifiedHome() {
     streakDays: 0,
   });
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!participantId) return;
 
     const loadGamification = async () => {
+      setIsLoading(true);
       try {
         // Check and reset hearts for new day (11:59 PM EST)
         // Also check and update streak if needed
         const { checkAndResetDailyHearts, updateStreak } = await import('../utils/gamification');
-        await checkAndResetDailyHearts(userId);
-        await updateStreak(userId);
+        await checkAndResetDailyHearts(participantId);
+        await updateStreak(participantId);
         
         // Then load updated gamification data
         const { data, error } = await supabase
           .from('user_gamification')
           .select('xp, hearts, streak_days')
-          .eq('user_id', userId)
+          .eq('participant_id', participantId)
           .single();
 
         if (data && !error) {
@@ -52,12 +54,12 @@ export function GamifiedHome() {
           // If streak was 0, update it in the database immediately
           if (streakDays === 0) {
             const { updateGamificationData } = await import('../utils/gamification');
-            await updateGamificationData(userId, { streakDays: 1 });
+            await updateGamificationData(participantId, { streakDays: 1 });
             // Reload data after update
             const { data: updatedData } = await supabase
               .from('user_gamification')
               .select('xp, hearts, streak_days')
-              .eq('user_id', userId)
+              .eq('participant_id', participantId)
               .single();
             
             if (updatedData) {
@@ -77,11 +79,13 @@ export function GamifiedHome() {
         }
       } catch (error) {
         console.error('Error loading gamification data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadGamification();
-  }, [userId]);
+  }, [participantId]);
 
   // Load leaderboard data
   useEffect(() => {
@@ -90,42 +94,42 @@ export function GamifiedHome() {
         // Get all gamified users (Aral, Test, Nikhil)
         const gamifiedUsernames = ['Aral', 'Test', 'Nikhil'];
         
-        // Fetch users and their gamification data
-        const { data: usersData, error: usersError } = await supabase
-          .from('users')
+        // Fetch participants and their gamification data
+        const { data: participantsData, error: participantsError } = await supabase
+          .from('participants')
           .select('id, username')
           .in('username', gamifiedUsernames);
 
-        if (usersError) {
-          console.error('Error fetching users:', usersError);
+        if (participantsError) {
+          console.error('Error fetching participants:', participantsError);
           return;
         }
 
-        if (!usersData || usersData.length === 0) {
+        if (!participantsData || participantsData.length === 0) {
           return;
         }
 
-        const userIds = usersData.map(u => u.id);
+        const participantIds = participantsData.map(p => p.id);
 
-        // Fetch gamification data for these users
+        // Fetch gamification data for these participants
         const { data: gamData, error: gamError } = await supabase
           .from('user_gamification')
-          .select('user_id, xp')
-          .in('user_id', userIds);
+          .select('participant_id, xp')
+          .in('participant_id', participantIds);
 
         if (gamError) {
           console.error('Error fetching gamification data:', gamError);
           return;
         }
 
-        // Combine user data with gamification data
-        const leaderboardEntries: LeaderboardEntry[] = usersData
-          .map(user => {
-            const gamDataForUser = gamData?.find(g => g.user_id === user.id);
+        // Combine participant data with gamification data
+        const leaderboardEntries: LeaderboardEntry[] = participantsData
+          .map(participant => {
+            const gamDataForParticipant = gamData?.find(g => g.participant_id === participant.id);
             return {
-              username: user.username,
-              xp: gamDataForUser?.xp || 0,
-              userId: user.id,
+              username: participant.username,
+              xp: gamDataForParticipant?.xp || 0,
+              participantId: participant.id,
             };
           })
           .sort((a, b) => b.xp - a.xp); // Sort by XP descending
@@ -150,13 +154,13 @@ export function GamifiedHome() {
       window.removeEventListener('videoCompleted', handleRefresh);
       window.removeEventListener('focus', handleRefresh);
     };
-  }, [userId]); // Reload when user changes or when XP updates
+  }, [participantId]); // Reload when user changes or when XP updates
 
   const handlePlay = () => {
     navigate('/journey');
   };
 
-  if (!userId || !username) {
+  if (!participantId || !username) {
     return null;
   }
 
@@ -182,6 +186,35 @@ export function GamifiedHome() {
 
       {/* Main Content */}
       <main className="gamified-main">
+        {isLoading ? (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '400px',
+            fontSize: '18px',
+            color: '#e0e7ff',
+            gridColumn: '1 / -1'
+          }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '16px'
+            }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                border: '4px solid rgba(255, 255, 255, 0.1)',
+                borderTop: '4px solid #7c3aed',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }} />
+              <p>Loading your journey...</p>
+            </div>
+          </div>
+        ) : (
+          <>
         {/* Left Sidebar - Leaderboard */}
         <aside className="gamified-sidebar-left">
           <div className="leaderboard-section">
@@ -191,11 +224,11 @@ export function GamifiedHome() {
                 <div className="leaderboard-empty">No players yet</div>
               ) : (
                 leaderboard.map((entry, index) => {
-                  const isCurrentUser = entry.userId === userId;
+                  const isCurrentUser = entry.participantId === participantId;
                   const isTopThree = index < 3;
                   return (
                     <div
-                      key={entry.userId}
+                      key={entry.participantId}
                       className={`leaderboard-item ${isCurrentUser ? 'current-user' : ''} ${isTopThree ? 'top-three' : ''}`}
                     >
                       <span className={`rank ${isTopThree ? `rank-${index + 1}` : ''}`}>
@@ -237,6 +270,8 @@ export function GamifiedHome() {
             </div>
           </div>
         </aside>
+        </>
+        )}
       </main>
 
       {/* Bottom - Play Button */}

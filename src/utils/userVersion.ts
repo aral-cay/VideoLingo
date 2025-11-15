@@ -1,22 +1,20 @@
 /**
  * User Version Detection
- * Determines if a user should see the gamified or control version
+ * Determines if a participant should see the gamified or control version
+ * based on their condition
  */
 
-const GAMIFIED_USERS = ['Aral', 'Test', 'Nikhil'];
-const CONTROL_USERS = ['Kabir', 'Luca'];
+import { Condition } from './studyCondition';
 
-export function isGamifiedUser(username: string | null): boolean {
-  if (!username) return false;
-  return GAMIFIED_USERS.includes(username);
+export function isGamifiedVersion(condition: Condition | null): boolean {
+  return condition === 'experimental';
 }
 
-export function isControlUser(username: string | null): boolean {
-  if (!username) return false;
-  return CONTROL_USERS.includes(username);
+export function isControlVersion(condition: Condition | null): boolean {
+  return condition === 'control';
 }
 
-export function getUserVersion(username: string | null): 'gamified' | 'control' {
-  return isGamifiedUser(username) ? 'gamified' : 'control';
+export function getUserVersion(condition: Condition | null): 'gamified' | 'control' {
+  return isGamifiedVersion(condition) ? 'gamified' : 'control';
 }
 
