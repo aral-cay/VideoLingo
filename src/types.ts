@@ -5,6 +5,7 @@ export interface Video {
   duration: number;
   thumbnail: string;
   src: string;
+  theme: string;
   captions: Array<{ lang: string; url: string | null }>;
   quiz: {
     instructions: string;

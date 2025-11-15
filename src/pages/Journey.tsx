@@ -6,6 +6,7 @@ import videosData from '../data/videos.json';
 import type { Video } from '../types';
 import { isVideoUnlocked, getVideoScore } from '../utils/userProgress';
 import { supabase } from '../lib/supabase';
+import { getCharacterImage } from '../utils/characterAvatar';
 import './Journey.css';
 
 interface GamificationData {
@@ -21,7 +22,7 @@ interface OtherUserPosition {
 }
 
 export function Journey() {
-  const { participantId, username, condition, logout } = useAuth();
+  const { participantId, username, condition } = useAuth();
   const navigate = useNavigate();
   const [videos] = useState<Video[]>(videosData as Video[]);
   const [videoStates, setVideoStates] = useState<Map<string, { unlocked: boolean; score: number | null; stars: number; totalQuestions: number }>>(new Map());
@@ -117,7 +118,6 @@ export function Journey() {
           return;
         }
 
-        const allVideoIds = videos.map(v => v.id);
         const otherUserPositions: OtherUserPosition[] = [];
 
         for (let i = 0; i < participantsData.length; i++) {
@@ -220,8 +220,8 @@ export function Journey() {
       {/* Header */}
       <header className="journey-header">
         <div className="journey-header-left">
-          <span className="journey-language">VideoLingo</span>
-          <span className="journey-welcome">Welcome back {username}!</span>
+          <h1 className="app-title">VideoLingo</h1>
+          <span className="header-username">Welcome, {username}!</span>
         </div>
         <div className="journey-header-right">
           <div className="journey-xp">
@@ -229,89 +229,83 @@ export function Journey() {
             <span className="xp-value">{gamification.xp}</span>
           </div>
           <div className="journey-hearts">
-            <span className="heart-icon">♡</span>
+            <span className="heart-icon">♥</span>
             <span className="heart-value">{gamification.hearts}</span>
           </div>
+          <button className="journey-home-button" onClick={handleHome}>
+            Home
+          </button>
         </div>
       </header>
-
-      {/* Home Button */}
-      <div className="journey-home-button-container">
-        <button className="journey-home-button" onClick={handleHome}>
-          Home
-        </button>
-      </div>
 
       {/* Roadmap */}
       <main className="journey-main">
         <div className="journey-roadmap">
           <h2 className="journey-title">Your Learning Journey</h2>
-          
+
           <div className="themes-container">
             {videos.map((video, index) => {
               const state = videoStates.get(video.id) || { unlocked: false, score: null, stars: 0, totalQuestions: 10 };
-              const isFirstInTheme = index === 0 || (index > 0 && videos[index - 1].id !== video.id);
+              const isFirstInTheme = index === 0 || (index > 0 && videos[index - 1].theme !== video.theme);
               const totalQuestions = state.totalQuestions || video.quiz?.questions?.length || 10;
-              
+
               // Check if any other users are at this position
               const usersAtThisPosition = otherUsers.filter(u => u.position === index);
-              
+
               return (
-                <div key={video.id} className="video-node-container">
+                <div key={video.id} className="video-node-container" data-index={index}>
                   {/* Connection line */}
                   {index > 0 && (
                     <div className={`connection-line ${state.unlocked ? 'unlocked' : 'locked'}`}></div>
                   )}
-                  
+
                   {/* Video Node */}
                   <div
                     className={`video-node ${state.unlocked ? 'unlocked' : 'locked'} ${state.stars > 0 ? 'completed' : ''}`}
                     onClick={() => handleVideoClick(video, state.unlocked)}
                   >
+                    {/* Theme Label */}
+                    {isFirstInTheme && (
+                      <div className={`theme-label ${state.unlocked ? '' : 'locked-theme'}`}>
+                        Theme: {state.unlocked ? video.theme : '???'}
+                      </div>
+                    )}
+
                     {/* Other users at this position */}
                     {usersAtThisPosition.length > 0 && (
                       <div className="other-users-at-node">
-                        {usersAtThisPosition.map((otherUser, participantIdx) => (
+                        {usersAtThisPosition.map((otherUser) => (
                           <div
                             key={otherUser.participantId}
                             className="other-user-indicator"
-                            style={{
-                              '--user-color': otherUser.color,
-                              left: `${50 + (participantIdx - (usersAtThisPosition.length - 1) / 2) * 40}%`,
-                            } as React.CSSProperties}
                             title={otherUser.username}
                           >
-                            <div className="other-user-avatar" style={{ backgroundColor: otherUser.color }}>
-                              {otherUser.username.charAt(0).toUpperCase()}
+                            <div className="other-user-avatar">
+                              <img
+                                src={getCharacterImage(otherUser.username, 'profile')}
+                                alt={otherUser.username}
+                                className="other-user-avatar-image"
+                              />
                             </div>
                             <div className="other-user-name">{otherUser.username}</div>
                           </div>
                         ))}
                       </div>
                     )}
+
                     {state.unlocked ? (
                       <>
                         <div className="video-node-content">
                           {state.stars > 0 ? (
-                            <div className="stars-display">
-                              {[...Array(3)].map((_, i) => (
-                                <span key={i} className={`star ${i < state.stars ? 'filled' : ''}`}>☆</span>
-                              ))}
-                            </div>
+                            <>
+                              <div className="video-node-score-inside">
+                                Best: {state.score}/{totalQuestions}
+                              </div>
+                            </>
                           ) : (
                             <div className="video-number">{index + 1}</div>
                           )}
                         </div>
-                        {isFirstInTheme && (
-                          <div className="theme-label">
-                            Theme: {video.title.split(' ').slice(0, 2).join(' ')}
-                          </div>
-                        )}
-                        {state.score !== null && (
-                          <div className="video-node-score">
-                            Best: {state.score}/{totalQuestions}
-                          </div>
-                        )}
                         {state.stars === 3 && (
                           <div className="complete-badge">Complete</div>
                         )}
@@ -321,12 +315,16 @@ export function Journey() {
                         <div className="video-node-content locked-content">
                           <div className="lock-icon">🔒</div>
                         </div>
-                        {isFirstInTheme && (
-                          <div className="theme-label locked-theme">
-                            Theme: ???
-                          </div>
-                        )}
                       </>
+                    )}
+
+                    {/* Stars Display - Below Node */}
+                    {state.unlocked && state.stars > 0 && (
+                      <div className="stars-display-below">
+                        {[...Array(3)].map((_, i) => (
+                          <span key={i} className={`star ${i < state.stars ? 'filled' : ''}`}>★</span>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>
