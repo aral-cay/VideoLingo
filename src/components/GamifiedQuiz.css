@@ -220,6 +220,20 @@
   border-color: rgba(74, 158, 255, 0.5);
 }
 
+.gamified-quiz-hide-button:disabled {
+  background: rgba(74, 158, 255, 0.05);
+  border-color: rgba(74, 158, 255, 0.15);
+  color: #6b7280;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.gamified-quiz-hide-button:disabled:hover {
+  background: rgba(74, 158, 255, 0.05);
+  border-color: rgba(74, 158, 255, 0.15);
+  transform: none;
+}
+
 /* Start Screen */
 .gamified-quiz-start {
   display: flex;

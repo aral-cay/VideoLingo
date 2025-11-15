@@ -231,7 +231,12 @@ export function GamifiedQuiz({
         <div className="gamified-quiz-content">
           <div className="gamified-quiz-header">
             <h2>Word Order Challenge</h2>
-            <button className="gamified-quiz-hide-button" onClick={handleHide}>
+            <button 
+              className="gamified-quiz-hide-button" 
+              onClick={handleHide}
+              disabled
+              title="Hiding is disabled, will erase quiz progress."
+            >
               Hide
             </button>
           </div>
@@ -301,7 +306,12 @@ export function GamifiedQuiz({
               <span className="heart-icon">♡</span>
               <span className="heart-value">{currentHearts}</span>
             </div>
-            <button className="gamified-quiz-hide-button" onClick={handleHide}>
+            <button 
+              className="gamified-quiz-hide-button" 
+              onClick={handleHide}
+              disabled
+              title="Hiding is disabled, will erase quiz progress."
+            >
               Hide
             </button>
           </div>
