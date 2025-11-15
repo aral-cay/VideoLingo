@@ -1,6 +1,6 @@
 /**
  * Video State Management with Supabase
- * Tracks video position, captions state, etc.
+ * Tracks video position, captions state, etc. per participant
  */
 
 import { supabase } from '../lib/supabase';
@@ -12,14 +12,14 @@ export interface VideoState {
 }
 
 /**
- * Get video state from Supabase
+ * Get video state from Supabase for a participant
  */
-export async function getVideoState(userId: string, videoId: string): Promise<VideoState | null> {
+export async function getVideoState(participantId: string, videoId: string): Promise<VideoState | null> {
   try {
     const { data, error } = await supabase
       .from('video_states')
       .select('completion_percent, last_position_sec, last_caption_state')
-      .eq('user_id', userId)
+      .eq('participant_id', participantId)
       .eq('video_id', videoId)
       .single();
 
@@ -44,10 +44,10 @@ export async function getVideoState(userId: string, videoId: string): Promise<Vi
 }
 
 /**
- * Save video state to Supabase
+ * Save video state to Supabase for a participant
  */
 export async function saveVideoState(
-  userId: string,
+  participantId: string,
   videoId: string,
   state: VideoState
 ): Promise<void> {
@@ -55,14 +55,14 @@ export async function saveVideoState(
     const { error } = await supabase
       .from('video_states')
       .upsert({
-        user_id: userId,
+        participant_id: participantId,
         video_id: videoId,
         completion_percent: state.completionPercent,
         last_position_sec: state.lastPositionSec,
         last_caption_state: state.lastCaptionState,
         updated_at: new Date().toISOString(),
       }, {
-        onConflict: 'user_id,video_id',
+        onConflict: 'participant_id,video_id',
       });
 
     if (error) {

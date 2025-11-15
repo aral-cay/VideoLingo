@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { isGamifiedUser } from '../utils/userVersion';
+import { isGamifiedVersion } from '../utils/userVersion';
 import videosData from '../data/videos.json';
 import type { Video } from '../types';
 import { isVideoUnlocked, getVideoScore } from '../utils/userProgress';
@@ -14,14 +14,14 @@ interface GamificationData {
 }
 
 interface OtherUserPosition {
-  userId: string;
+  participantId: string;
   username: string;
   position: number; // Index of the last completed video (or first unlocked if none completed)
   color: string;
 }
 
 export function Journey() {
-  const { userId, username, logout } = useAuth();
+  const { participantId, username, condition, logout } = useAuth();
   const navigate = useNavigate();
   const [videos] = useState<Video[]>(videosData as Video[]);
   const [videoStates, setVideoStates] = useState<Map<string, { unlocked: boolean; score: number | null; stars: number; totalQuestions: number }>>(new Map());
@@ -33,13 +33,13 @@ export function Journey() {
   const userColors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94'];
 
   useEffect(() => {
-    if (!userId || !username) {
+    if (!participantId || !username) {
       navigate('/');
       return;
     }
 
-    // Only gamified users can access journey page
-    if (!isGamifiedUser(username)) {
+    // Only gamified condition can access journey page
+    if (!isGamifiedVersion(condition)) {
       navigate('/');
       return;
     }
@@ -50,7 +50,7 @@ export function Journey() {
         const { data: gamData } = await supabase
           .from('user_gamification')
           .select('xp, hearts')
-          .eq('user_id', userId)
+          .eq('participant_id', participantId)
           .single();
 
         if (gamData) {
@@ -69,8 +69,8 @@ export function Journey() {
 
       for (let i = 0; i < videos.length; i++) {
         const video = videos[i];
-        const unlocked = await isVideoUnlocked(userId, video.id, i, allVideoIds);
-        const score = await getVideoScore(userId, video.id);
+        const unlocked = await isVideoUnlocked(participantId, video.id, i, allVideoIds);
+        const score = await getVideoScore(participantId, video.id);
         const totalQuestions = video.quiz?.questions?.length || 10;
         
         // Get stars for this video
@@ -79,7 +79,7 @@ export function Journey() {
           const { data: progressData } = await supabase
             .from('user_progress')
             .select('video_stars')
-            .eq('user_id', userId)
+            .eq('participant_id', participantId)
             .single();
           
           if (progressData?.video_stars && typeof progressData.video_stars === 'object') {
@@ -106,28 +106,28 @@ export function Journey() {
           return;
         }
 
-        // Fetch other users
-        const { data: usersData, error: usersError } = await supabase
-          .from('users')
+        // Fetch other participants
+        const { data: participantsData, error: participantsError } = await supabase
+          .from('participants')
           .select('id, username')
           .in('username', otherUsernames);
 
-        if (usersError || !usersData) {
-          console.error('Error fetching other users:', usersError);
+        if (participantsError || !participantsData) {
+          console.error('Error fetching other participants:', participantsError);
           return;
         }
 
         const allVideoIds = videos.map(v => v.id);
         const otherUserPositions: OtherUserPosition[] = [];
 
-        for (let i = 0; i < usersData.length; i++) {
-          const user = usersData[i];
+        for (let i = 0; i < participantsData.length; i++) {
+          const participant = participantsData[i];
           
-          // Get user's progress
+          // Get participant's progress
           const { data: progressData } = await supabase
             .from('user_progress')
             .select('completed_videos')
-            .eq('user_id', user.id)
+            .eq('participant_id', participant.id)
             .single();
 
           const completedVideos = (progressData?.completed_videos as string[]) || [];
@@ -151,8 +151,8 @@ export function Journey() {
           }
 
           otherUserPositions.push({
-            userId: user.id,
-            username: user.username,
+            participantId: participant.id,
+            username: participant.username,
             position: position,
             color: userColors[i % userColors.length],
           });
@@ -166,18 +166,18 @@ export function Journey() {
 
     loadData();
     loadOtherUsers();
-  }, [userId, username, videos, refreshKey, navigate]);
+  }, [participantId, username, videos, refreshKey, navigate]);
 
   useEffect(() => {
     const handleRefresh = async () => {
       setRefreshKey(prev => prev + 1);
       // Refresh gamification data (hearts, XP)
-      if (userId) {
+      if (participantId) {
         try {
           const { data: gamData } = await supabase
             .from('user_gamification')
             .select('xp, hearts')
-            .eq('user_id', userId)
+            .eq('participant_id', participantId)
             .single();
 
           if (gamData) {
@@ -199,7 +199,7 @@ export function Journey() {
       window.removeEventListener('videoCompleted', handleRefresh);
       window.removeEventListener('focus', handleRefresh);
     };
-  }, [userId]);
+  }, [participantId]);
 
   const handleHome = () => {
     navigate('/');
@@ -211,7 +211,7 @@ export function Journey() {
     }
   };
 
-  if (!userId || !username) {
+  if (!participantId || !username) {
     return null;
   }
 
@@ -271,13 +271,13 @@ export function Journey() {
                     {/* Other users at this position */}
                     {usersAtThisPosition.length > 0 && (
                       <div className="other-users-at-node">
-                        {usersAtThisPosition.map((otherUser, userIdx) => (
+                        {usersAtThisPosition.map((otherUser, participantIdx) => (
                           <div
-                            key={otherUser.userId}
+                            key={otherUser.participantId}
                             className="other-user-indicator"
                             style={{
                               '--user-color': otherUser.color,
-                              left: `${50 + (userIdx - (usersAtThisPosition.length - 1) / 2) * 40}%`,
+                              left: `${50 + (participantIdx - (usersAtThisPosition.length - 1) / 2) * 40}%`,
                             } as React.CSSProperties}
                             title={otherUser.username}
                           >

@@ -1,6 +1,6 @@
 /**
  * User Progress Management with Supabase
- * Tracks completed videos and quiz scores per user
+ * Tracks completed videos and quiz scores per participant
  */
 
 import { supabase } from '../lib/supabase';
@@ -11,14 +11,14 @@ export interface UserProgress {
 }
 
 /**
- * Get user progress from Supabase
+ * Get participant progress from Supabase
  */
-export async function getUserProgress(userId: string): Promise<UserProgress> {
+export async function getUserProgress(participantId: string): Promise<UserProgress> {
   try {
     const { data, error } = await supabase
       .from('user_progress')
       .select('completed_videos, video_scores')
-      .eq('user_id', userId)
+      .eq('participant_id', participantId)
       .single();
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
@@ -42,19 +42,19 @@ export async function getUserProgress(userId: string): Promise<UserProgress> {
 }
 
 /**
- * Save user progress to Supabase
+ * Save participant progress to Supabase
  */
-export async function saveUserProgress(userId: string, progress: UserProgress): Promise<void> {
+export async function saveUserProgress(participantId: string, progress: UserProgress): Promise<void> {
   try {
     const { error } = await supabase
       .from('user_progress')
       .upsert({
-        user_id: userId,
+        participant_id: participantId,
         completed_videos: progress.completedVideos,
         video_scores: progress.videoScores,
         updated_at: new Date().toISOString(),
       }, {
-        onConflict: 'user_id',
+        onConflict: 'participant_id',
       });
 
     if (error) {
@@ -68,12 +68,12 @@ export async function saveUserProgress(userId: string, progress: UserProgress): 
 }
 
 /**
- * Check if a video is unlocked for a user
+ * Check if a video is unlocked for a participant
  * First video (index 0) is always unlocked
  * Subsequent videos are unlocked when the previous video is completed
  */
 export async function isVideoUnlocked(
-  userId: string,
+  participantId: string,
   videoId: string,
   videoIndex: number,
   allVideoIds: string[]
@@ -83,7 +83,7 @@ export async function isVideoUnlocked(
     return true;
   }
 
-  const progress = await getUserProgress(userId);
+  const progress = await getUserProgress(participantId);
 
   // STRICT CHECK: Video is unlocked ONLY if the previous video is completed
   const completedVideos = Array.isArray(progress.completedVideos) ? progress.completedVideos : [];
@@ -112,12 +112,12 @@ export async function isVideoUnlocked(
  * Mark a video as completed and unlock the next one
  */
 export async function markVideoCompleted(
-  userId: string,
+  participantId: string,
   videoId: string,
   score: number,
   totalQuestions: number
 ): Promise<void> {
-  const progress = await getUserProgress(userId);
+  const progress = await getUserProgress(participantId);
 
   // Add to completed videos if not already there
   if (!progress.completedVideos.includes(videoId)) {
@@ -130,21 +130,21 @@ export async function markVideoCompleted(
     progress.videoScores[videoId] = score;
   }
 
-  await saveUserProgress(userId, progress);
+  await saveUserProgress(participantId, progress);
 }
 
 /**
  * Get the highest score for a video
  */
-export async function getVideoScore(userId: string, videoId: string): Promise<number | null> {
-  const progress = await getUserProgress(userId);
+export async function getVideoScore(participantId: string, videoId: string): Promise<number | null> {
+  const progress = await getUserProgress(participantId);
   return progress.videoScores[videoId] || null;
 }
 
 /**
  * Check if a video is completed
  */
-export async function isVideoCompleted(userId: string, videoId: string): Promise<boolean> {
-  const progress = await getUserProgress(userId);
+export async function isVideoCompleted(participantId: string, videoId: string): Promise<boolean> {
+  const progress = await getUserProgress(participantId);
   return progress.completedVideos.includes(videoId);
 }

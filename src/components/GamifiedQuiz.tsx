@@ -9,7 +9,7 @@ interface GamifiedQuizProps {
   onComplete: (score: { correct: number; total: number; accuracy: number }) => void;
   isVisible: boolean;
   onVisibilityChange: (visible: boolean) => void;
-  userId?: string;
+  participantId?: string;
   onHeartsUpdate?: (hearts: number) => void;
 }
 
@@ -19,7 +19,7 @@ export function GamifiedQuiz({
   onComplete,
   isVisible,
   onVisibilityChange,
-  userId,
+  participantId,
   onHeartsUpdate,
 }: GamifiedQuizProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -38,17 +38,17 @@ export function GamifiedQuiz({
 
   // Load initial hearts
   useEffect(() => {
-    if (userId && isVisible) {
+    if (participantId && isVisible) {
       const loadHearts = async () => {
         const { getGamificationData } = await import('../utils/gamification');
-        const data = await getGamificationData(userId);
+        const data = await getGamificationData(participantId);
         if (data) {
           setCurrentHearts(data.hearts);
         }
       };
       loadHearts();
     }
-  }, [userId, isVisible]);
+  }, [participantId, isVisible]);
 
   // Initialize words for current question
   useEffect(() => {
@@ -138,13 +138,13 @@ export function GamifiedQuiz({
     } else {
       setXpGained(0);
       // Deduct heart immediately for wrong answer
-      if (userId) {
+      if (participantId) {
         const deductHeart = async () => {
           const { getGamificationData, updateHearts } = await import('../utils/gamification');
-          const current = await getGamificationData(userId);
+          const current = await getGamificationData(participantId);
           if (current) {
             const newHearts = Math.max(0, current.hearts - 1);
-            await updateHearts(userId, newHearts);
+            await updateHearts(participantId, newHearts);
             setCurrentHearts(newHearts);
             if (onHeartsUpdate) {
               onHeartsUpdate(newHearts);
