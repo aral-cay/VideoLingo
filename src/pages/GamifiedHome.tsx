@@ -178,9 +178,12 @@ export function GamifiedHome() {
             <span className="xp-value">{gamification.xp}</span>
           </div>
           <div className="gamified-hearts">
-            <span className="heart-icon">♡</span>
+            <span className="heart-icon">♥</span>
             <span className="heart-value">{gamification.hearts}</span>
           </div>
+          <button className="gamified-logout-button" onClick={logout}>
+            Logout
+          </button>
         </div>
       </header>
 
@@ -278,9 +281,6 @@ export function GamifiedHome() {
       <footer className="gamified-footer">
         <button className="gamified-play-button" onClick={handlePlay}>
           Play
-        </button>
-        <button className="gamified-logout-button" onClick={logout}>
-          Logout
         </button>
       </footer>
     </div>
