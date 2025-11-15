@@ -12,7 +12,7 @@
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
   color: #e0e7ff;
 }
 
@@ -20,16 +20,18 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 2rem;
+  padding: 1.25rem;
+  overflow: hidden;
 }
 
 .gamified-quiz-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+  flex-shrink: 0;
 }
 
 .gamified-quiz-header-right {
@@ -60,11 +62,146 @@
 }
 
 .gamified-quiz-header h2 {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #4a9eff;
   margin: 0;
   text-shadow: 0 0 10px rgba(74, 158, 255, 0.5);
+}
+
+/* Character Display */
+.gamified-quiz-character {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+  margin-bottom: 0.75rem;
+  height: 90px;
+  background: rgba(10, 14, 39, 0.4);
+  border-radius: 12px;
+  border: 1px solid rgba(74, 158, 255, 0.2);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 0 20px rgba(74, 158, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.gamified-quiz-character::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(74, 158, 255, 0.1) 0%, transparent 70%);
+  animation: quizCharacterRotate 10s linear infinite;
+}
+
+@keyframes quizCharacterRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.quiz-character-image {
+  width: 80px;
+  height: 90px;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 8px rgba(74, 158, 255, 0.5));
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: quizCharacterFloat 2s ease-in-out infinite, quizCharacterPulse 3s ease-in-out infinite;
+}
+
+@keyframes quizCharacterFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes quizCharacterPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(74, 158, 255, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 25px rgba(74, 158, 255, 0.8)) drop-shadow(0 0 35px rgba(124, 58, 237, 0.4));
+  }
+}
+
+/* Happy emotion - extra glow */
+.gamified-quiz-character.character-emotion-happy {
+  border-color: rgba(76, 175, 80, 0.5);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(76, 175, 80, 0.4),
+    inset 0 0 20px rgba(76, 175, 80, 0.2);
+  animation: happyGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes happyGlow {
+  0%, 100% {
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.3),
+      0 0 30px rgba(76, 175, 80, 0.4),
+      inset 0 0 20px rgba(76, 175, 80, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.3),
+      0 0 50px rgba(76, 175, 80, 0.6),
+      inset 0 0 30px rgba(76, 175, 80, 0.3);
+  }
+}
+
+.gamified-quiz-character.character-emotion-happy .quiz-character-image {
+  filter: drop-shadow(0 0 20px rgba(76, 175, 80, 0.6)) drop-shadow(0 0 30px rgba(76, 175, 80, 0.4));
+  animation: quizCharacterFloat 2s ease-in-out infinite, quizCharacterHappy 1.5s ease-in-out infinite;
+}
+
+@keyframes quizCharacterHappy {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.05);
+  }
+}
+
+/* Sad emotion - dimmed */
+.gamified-quiz-character.character-emotion-sad {
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(239, 68, 68, 0.2),
+    inset 0 0 20px rgba(239, 68, 68, 0.1);
+}
+
+.gamified-quiz-character.character-emotion-sad .quiz-character-image {
+  filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.4)) brightness(0.9);
+  animation: quizCharacterFloat 2s ease-in-out infinite, quizCharacterSad 2s ease-in-out infinite;
+}
+
+@keyframes quizCharacterSad {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(0.98);
+  }
+}
+
+/* Neutral emotion - default */
+.gamified-quiz-character.character-emotion-neutral .quiz-character-image {
+  animation: quizCharacterFloat 2s ease-in-out infinite, quizCharacterPulse 3s ease-in-out infinite;
 }
 
 .gamified-quiz-hide-button {
@@ -130,15 +267,18 @@
 .gamified-quiz-question {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 0.75rem;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .gamified-quiz-prompt {
   background: rgba(74, 158, 255, 0.1);
   border: 1px solid rgba(74, 158, 255, 0.3);
-  border-radius: 15px;
-  padding: 1.5rem;
+  border-radius: 12px;
+  padding: 1rem;
+  flex-shrink: 0;
 }
 
 .prompt-label {
@@ -150,27 +290,31 @@
 }
 
 .prompt-text {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: #e0e7ff;
   margin: 0;
+  line-height: 1.4;
 }
 
 /* Selected Words (Sentence being built) */
 .gamified-quiz-selected {
-  min-height: 100px;
+  min-height: 70px;
+  max-height: 100px;
   background: rgba(10, 14, 39, 0.6);
   border: 2px dashed rgba(74, 158, 255, 0.3);
-  border-radius: 15px;
-  padding: 1.5rem;
+  border-radius: 12px;
+  padding: 0.75rem;
+  flex-shrink: 0;
+  overflow-y: auto;
 }
 
 .selected-words-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.4rem;
   align-items: center;
-  min-height: 60px;
+  min-height: 40px;
 }
 
 .empty-sentence {
@@ -184,9 +328,9 @@
   background: linear-gradient(135deg, rgba(74, 158, 255, 0.3), rgba(124, 58, 237, 0.3));
   border: 2px solid rgba(74, 158, 255, 0.5);
   color: #e0e7ff;
-  padding: 0.75rem 1.25rem;
-  border-radius: 12px;
-  font-size: 1.1rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
@@ -203,22 +347,25 @@
 /* Available Words */
 .gamified-quiz-words {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .words-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.5rem;
   justify-content: center;
+  padding: 0.25rem 0;
 }
 
 .word-tile {
   background: rgba(74, 158, 255, 0.15);
   border: 1px solid rgba(74, 158, 255, 0.3);
   color: #4a9eff;
-  padding: 0.75rem 1.25rem;
-  border-radius: 12px;
-  font-size: 1rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
@@ -237,10 +384,11 @@
 
 /* Feedback */
 .gamified-quiz-feedback {
-  padding: 1.5rem;
-  border-radius: 15px;
-  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 12px;
+  margin: 0.5rem 0;
   animation: slideIn 0.3s ease-out;
+  flex-shrink: 0;
 }
 
 @keyframes slideIn {
@@ -275,12 +423,12 @@
 }
 
 .gamified-quiz-feedback .feedback-icon {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: bold;
 }
 
 .gamified-quiz-feedback .feedback-text {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 700;
 }
 
@@ -309,22 +457,23 @@
 .gamified-quiz-actions {
   display: flex;
   justify-content: center;
-  padding-top: 1rem;
+  padding-top: 0.5rem;
+  flex-shrink: 0;
 }
 
 .gamified-quiz-check-button {
   background: linear-gradient(135deg, rgba(74, 158, 255, 0.3), rgba(124, 58, 237, 0.3));
   border: 2px solid rgba(74, 158, 255, 0.5);
   color: #e0e7ff;
-  padding: 1rem 3rem;
-  font-size: 1.2rem;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
   font-weight: 700;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s;
   text-transform: uppercase;
   letter-spacing: 2px;
-  min-width: 200px;
+  min-width: 180px;
 }
 
 .gamified-quiz-check-button:hover:not(:disabled) {
