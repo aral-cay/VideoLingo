@@ -520,6 +520,20 @@ body {
   gap: 1.5rem;
 }
 
+.quiz-prompt-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.prompt-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .quiz-prompt {
   font-size: 1.125rem;
   font-weight: 500;
@@ -535,6 +549,88 @@ body {
   gap: 0.75rem;
 }
 
+/* Word ordering interface */
+.quiz-selected-words {
+  min-height: 80px;
+  padding: 1rem;
+  background-color: var(--bg-light);
+  border: 2px dashed var(--border-color);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.selected-words-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 40px;
+}
+
+.empty-sentence {
+  color: var(--text-light);
+  font-style: italic;
+  width: 100%;
+  text-align: center;
+}
+
+.selected-word-tile {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.selected-word-tile:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.selected-word-tile:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+
+.quiz-available-words {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.words-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.word-tile {
+  background-color: white;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.word-tile:hover {
+  background-color: var(--bg-light);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+/* Legacy radio button styles (kept for backwards compatibility) */
 .quiz-choice {
   display: flex;
   align-items: center;
@@ -1143,6 +1239,13 @@ body {
   z-index: 1000;
   overflow-y: auto;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.youtube-quiz-sidebar.hidden {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .youtube-quiz-sidebar .quiz-modal {

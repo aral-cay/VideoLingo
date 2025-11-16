@@ -282,7 +282,19 @@ export function GamifiedQuiz({
   };
 
   const handleHide = () => {
+    // Save current state before hiding
+    if (quizStarted && quiz.questions[currentQuestionIndex]) {
+      const question = quiz.questions[currentQuestionIndex];
+      setSavedQuestionStates(prev => new Map(prev).set(question.id, {
+        selectedWords,
+        availableWords
+      }));
+    }
     onVisibilityChange(false);
+  };
+
+  const handleShow = () => {
+    onVisibilityChange(true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -291,7 +303,10 @@ export function GamifiedQuiz({
     }
   };
 
-  if (!isVisible) return null;
+  // When hidden, don't render anything - parent will show the "Open Quiz" button
+  if (!isVisible) {
+    return null;
+  }
 
   if (!quizStarted) {
     return (
@@ -302,8 +317,6 @@ export function GamifiedQuiz({
             <button 
               className="gamified-quiz-hide-button" 
               onClick={handleHide}
-              disabled
-              title="Hiding is disabled, will erase quiz progress."
             >
               Hide
             </button>
@@ -377,8 +390,6 @@ export function GamifiedQuiz({
             <button 
               className="gamified-quiz-hide-button" 
               onClick={handleHide}
-              disabled
-              title="Hiding is disabled, will erase quiz progress."
             >
               Hide
             </button>

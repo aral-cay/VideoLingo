@@ -33,10 +33,11 @@ export function QuizModal({
 }: QuizModalProps) {
   const { participantId, username, condition } = useAuth();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [answers, setAnswers] = useState<Array<{ questionId: string; answerIndex: number; correct: boolean; responseTime: number }>>([]);
-  // Store selected answers for each question to preserve when navigating
-  const [savedAnswers, setSavedAnswers] = useState<Map<string, number>>(new Map());
+  const [selectedWords, setSelectedWords] = useState<string[]>([]);
+  const [availableWords, setAvailableWords] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<Array<{ questionId: string; correct: boolean; responseTime: number }>>([]);
+  // Store selected words and available words for each question to preserve when navigating
+  const [savedQuestionStates, setSavedQuestionStates] = useState<Map<string, { selectedWords: string[]; availableWords: string[] }>>(new Map());
   // Store feedback state for each question
   const [savedFeedback, setSavedFeedback] = useState<Map<string, { isCorrect: boolean; checked: boolean }>>(new Map());
   const [quizStarted, setQuizStarted] = useState(false);
@@ -51,28 +52,51 @@ export function QuizModal({
     if (isVisible && !quizStarted) {
       quizStartTimeRef.current = Date.now();
     }
+    // Don't reset quiz state when visibility changes - preserve progress
   }, [isVisible, quizStarted]);
 
-  useEffect(() => {
-    if (isVisible && modalRef.current) {
-      const firstInput = modalRef.current.querySelector('input[type="radio"]') as HTMLInputElement;
-      if (firstInput) {
-        firstInput.focus();
-      }
-    }
-  }, [isVisible, currentQuestionIndex]);
-
-  // Restore saved answer when navigating to a question
+  // Initialize words for current question or restore saved state
   useEffect(() => {
     if (quizStarted && quiz.questions[currentQuestionIndex]) {
       const question = quiz.questions[currentQuestionIndex];
-      const savedAnswer = savedAnswers.get(question.id);
+      const savedState = savedQuestionStates.get(question.id);
       const savedFeedbackState = savedFeedback.get(question.id);
       
-      if (savedAnswer !== undefined) {
-        setSelectedAnswer(savedAnswer);
+      if (savedState) {
+        // Restore saved state
+        setSelectedWords(savedState.selectedWords);
+        setAvailableWords(savedState.availableWords);
       } else {
-        setSelectedAnswer(null);
+        // Initialize new question
+        const correctAnswer = question.choices[question.correctIndex];
+        
+        // Split correct answer into words, handling punctuation
+        const correctWords = correctAnswer
+          .split(/\s+/)
+          .map(w => w.trim())
+          .filter(w => w.length > 0);
+        
+        // Get words from incorrect choices as potential distractors
+        const incorrectChoices = question.choices.filter((_, idx) => idx !== question.correctIndex);
+        const distractorWords = incorrectChoices
+          .flatMap(choice => 
+            choice
+              .split(/\s+/)
+              .map(w => w.trim())
+              .filter(w => w.length > 0)
+          )
+          .filter(word => !correctWords.includes(word)); // Remove words that are already in correct answer
+        
+        // Select 2-3 random distractors
+        const shuffledDistractors = [...new Set(distractorWords)].sort(() => Math.random() - 0.5);
+        const selectedDistractors = shuffledDistractors.slice(0, Math.min(3, shuffledDistractors.length));
+        
+        // Create word bank with correct words + 2-3 distractors
+        const wordBank = [...correctWords, ...selectedDistractors];
+        const shuffled = [...wordBank].sort(() => Math.random() - 0.5);
+        
+        setAvailableWords(shuffled);
+        setSelectedWords([]);
       }
       
       if (savedFeedbackState?.checked) {
@@ -85,7 +109,7 @@ export function QuizModal({
       
       questionStopwatch.start();
     }
-  }, [currentQuestionIndex, quizStarted, quiz.questions, savedAnswers, savedFeedback]);
+  }, [currentQuestionIndex, quizStarted, quiz.questions, savedQuestionStates, savedFeedback]);
 
   const handleStartQuiz = () => {
     setQuizStarted(true);
@@ -93,22 +117,53 @@ export function QuizModal({
     questionStopwatch.start();
   };
 
-  const handleAnswerSelect = (index: number) => {
-    setSelectedAnswer(index);
-    // Save the answer immediately so it persists when navigating
+  const handleWordClick = (word: string, index: number) => {
+    // Remove word from available and add to selected
+    const newAvailable = [...availableWords];
+    newAvailable.splice(index, 1);
+    setAvailableWords(newAvailable);
+    
+    const newSelected = [...selectedWords, word];
+    setSelectedWords(newSelected);
+    
+    // Save state immediately
     const question = quiz.questions[currentQuestionIndex];
-    setSavedAnswers(prev => new Map(prev).set(question.id, index));
+    setSavedQuestionStates(prev => new Map(prev).set(question.id, {
+      selectedWords: newSelected,
+      availableWords: newAvailable
+    }));
+  };
+
+  const handleRemoveWord = (word: string, index: number) => {
+    // Remove word from selected and add back to available
+    const newSelected = [...selectedWords];
+    newSelected.splice(index, 1);
+    setSelectedWords(newSelected);
+    
+    const newAvailable = [...availableWords, word];
+    setAvailableWords(newAvailable);
+    
+    // Save state immediately
+    const question = quiz.questions[currentQuestionIndex];
+    setSavedQuestionStates(prev => new Map(prev).set(question.id, {
+      selectedWords: newSelected,
+      availableWords: newAvailable
+    }));
   };
 
   const handleSubmit = () => {
-    if (selectedAnswer === null) return;
-
     const question = quiz.questions[currentQuestionIndex];
+    const correctAnswer = question.choices[question.correctIndex];
+    const correctWords = correctAnswer
+      .split(/\s+/)
+      .map(w => w.trim())
+      .filter(w => w.length > 0);
+    
     const responseTime = questionStopwatch.stop();
-    const isCorrect = selectedAnswer === question.correctIndex;
+    const isCorrect = selectedWords.length === correctWords.length &&
+      selectedWords.every((word, idx) => word === correctWords[idx]);
 
-    // Save the answer and feedback state
-    setSavedAnswers(prev => new Map(prev).set(question.id, selectedAnswer));
+    // Save feedback state
     setSavedFeedback(prev => new Map(prev).set(question.id, { isCorrect, checked: true }));
 
     setLastAnswerCorrect(isCorrect);
@@ -116,15 +171,18 @@ export function QuizModal({
   };
 
   const handleContinue = () => {
-    if (selectedAnswer === null) return;
-
     const question = quiz.questions[currentQuestionIndex];
-    const responseTime = questionStopwatch.elapsed;
-    const isCorrect = selectedAnswer === question.correctIndex;
+    const responseTime = questionStopwatch.getElapsed();
+    const correctAnswer = question.choices[question.correctIndex];
+    const correctWords = correctAnswer
+      .split(/\s+/)
+      .map(w => w.trim())
+      .filter(w => w.length > 0);
+    const isCorrect = selectedWords.length === correctWords.length &&
+      selectedWords.every((word, idx) => word === correctWords[idx]);
 
     const answerData = {
       questionId: question.id,
-      answerIndex: selectedAnswer,
       correct: isCorrect,
       responseTime,
     };
@@ -149,17 +207,24 @@ export function QuizModal({
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
+      // Save current state before navigating
+      const question = quiz.questions[currentQuestionIndex];
+      setSavedQuestionStates(prev => new Map(prev).set(question.id, {
+        selectedWords,
+        availableWords
+      }));
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
 
   const handleNext = () => {
     if (currentQuestionIndex < quiz.questions.length - 1) {
-      // Save current answer before navigating
-      if (selectedAnswer !== null) {
-        const question = quiz.questions[currentQuestionIndex];
-        setSavedAnswers(prev => new Map(prev).set(question.id, selectedAnswer));
-      }
+      // Save current state before navigating
+      const question = quiz.questions[currentQuestionIndex];
+      setSavedQuestionStates(prev => new Map(prev).set(question.id, {
+        selectedWords,
+        availableWords
+      }));
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
@@ -178,6 +243,14 @@ export function QuizModal({
   };
 
   const handleHide = () => {
+    // Save current state before hiding
+    if (quizStarted && quiz.questions[currentQuestionIndex]) {
+      const question = quiz.questions[currentQuestionIndex];
+      setSavedQuestionStates(prev => new Map(prev).set(question.id, {
+        selectedWords,
+        availableWords
+      }));
+    }
     onVisibilityChange(false);
   };
 
@@ -189,21 +262,15 @@ export function QuizModal({
     if (e.key === 'Escape' && isVisible) {
       if (quizCompleted) {
         onClose();
+      } else {
+        handleHide();
       }
-      // Hide button is disabled, so don't allow Escape to hide during quiz
     }
   };
 
-  if (!isVisible && !quizCompleted) {
-    return (
-      <button
-        className="quiz-show-button"
-        onClick={handleShow}
-        aria-label="Show quiz"
-      >
-        Show Quiz
-      </button>
-    );
+  // When hidden, don't render anything - parent will show the "Open Quiz" button
+  if (!isVisible) {
+    return null;
   }
 
   if (quizCompleted) {
@@ -255,15 +322,14 @@ export function QuizModal({
             <button
               className="quiz-hide-button"
               onClick={handleHide}
-              disabled
               aria-label="Hide quiz"
-              title="Hiding is disabled, will erase quiz progress."
             >
               Hide
             </button>
           </div>
           <div className="quiz-instructions">
-            <p>{quiz.instructions}</p>
+            <p>{quiz.instructions || 'Click words in order to form the Italian translation!'}</p>
+            <p>You'll see an English sentence. Click Italian words in the correct order to translate it.</p>
             <p>This quiz has {quiz.questions.length} questions.</p>
           </div>
           <button
@@ -279,6 +345,12 @@ export function QuizModal({
   }
 
   const currentQuestion = quiz.questions[currentQuestionIndex];
+  const correctAnswer = currentQuestion.choices[currentQuestion.correctIndex];
+  const correctWords = correctAnswer
+    .split(/\s+/)
+    .map(w => w.trim())
+    .filter(w => w.length > 0);
+  const canSubmit = selectedWords.length === correctWords.length;
   const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;
 
   return (
@@ -298,43 +370,56 @@ export function QuizModal({
           <button
             className="quiz-hide-button"
             onClick={handleHide}
-            disabled
             aria-label="Hide quiz"
-            title="Hiding is disabled, will erase quiz progress."
           >
             Hide
           </button>
         </div>
         <div className="quiz-question">
-          <p className="quiz-prompt">{currentQuestion.prompt}</p>
-          <fieldset className="quiz-choices" disabled={showFeedback}>
-            <legend className="sr-only">Select an answer</legend>
-            {currentQuestion.choices.map((choice, index) => {
-              const isSelected = selectedAnswer === index;
-              const isCorrect = index === currentQuestion.correctIndex;
-              const showAsCorrect = showFeedback && isCorrect;
-              const showAsIncorrect = showFeedback && isSelected && !isCorrect;
-              
-              return (
-                <label 
-                  key={index} 
-                  className={`quiz-choice ${showAsCorrect ? 'quiz-choice-correct' : ''} ${showAsIncorrect ? 'quiz-choice-incorrect' : ''}`}
-                >
-                  <input
-                    type="radio"
-                    name={`question-${currentQuestion.id}`}
-                    value={index}
-                    checked={isSelected}
-                    onChange={() => handleAnswerSelect(index)}
+          {/* English prompt */}
+          <div className="quiz-prompt-container">
+            <p className="prompt-label">Translate to Italian:</p>
+            <p className="quiz-prompt">{currentQuestion.prompt}</p>
+          </div>
+
+          {/* Selected words (sentence being built) */}
+          <div className="quiz-selected-words">
+            <div className="selected-words-container">
+              {selectedWords.length === 0 ? (
+                <div className="empty-sentence">Tap words below to build your answer</div>
+              ) : (
+                selectedWords.map((word, index) => (
+                  <button
+                    key={`selected-${index}`}
+                    className="selected-word-tile"
+                    onClick={() => !showFeedback && handleRemoveWord(word, index)}
                     disabled={showFeedback}
-                    aria-label={`Option ${index + 1}: ${choice}`}
-                  />
-                  <span>{choice}</span>
-                </label>
-              );
-            })}
-          </fieldset>
-          
+                  >
+                    {word}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Available words to click */}
+          {!showFeedback && (
+            <div className="quiz-available-words">
+              <div className="words-container">
+                {availableWords.map((word, index) => (
+                  <button
+                    key={`word-${index}`}
+                    className="word-tile"
+                    onClick={() => handleWordClick(word, index)}
+                  >
+                    {word}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Feedback */}
           {showFeedback && (
             <div className={`quiz-feedback ${lastAnswerCorrect ? 'quiz-feedback-correct' : 'quiz-feedback-incorrect'}`}>
               {lastAnswerCorrect ? (
@@ -347,13 +432,14 @@ export function QuizModal({
                   <span className="feedback-icon">✗</span>
                   <span className="feedback-text">Incorrect</span>
                   <div className="feedback-correct-answer">
-                    Correct answer: <strong>{currentQuestion.choices[currentQuestion.correctIndex]}</strong>
+                    Correct answer: <strong>{correctAnswer}</strong>
                   </div>
                 </div>
               )}
             </div>
           )}
-          
+
+          {/* Submit/Continue button */}
           <div className="quiz-actions">
             <div className="quiz-navigation">
               <button
@@ -369,7 +455,7 @@ export function QuizModal({
                   <button
                     className="quiz-next-button"
                     onClick={handleSubmit}
-                    disabled={selectedAnswer === null}
+                    disabled={!canSubmit}
                     aria-label="Submit answer"
                   >
                     Check
