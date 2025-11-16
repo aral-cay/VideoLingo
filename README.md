@@ -6,11 +6,6 @@ A web application for learning languages through video content with integrated q
 
 ## Screenshots
 
-> **Note:** Screenshot images should be added to `docs/images/` directory:
-> - `gamified-home.png` - Gamified home page with leaderboard, character, XP, hearts, and Play button
-> - `learning-journey.png` - Learning journey page showing progress through video lessons
-> - `video-player-quiz.png` - Video player with integrated quiz sidebar
-
 ### Gamified Home Page
 ![Gamified Home Page](docs/images/gamified-home.png)
 The gamified home page features a leaderboard, character avatar, XP and hearts display, streak counter, and a prominent Play button.
