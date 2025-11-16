@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { isGamifiedVersion } from '../utils/userVersion';
@@ -30,7 +30,6 @@ export function Journey() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [otherUsers, setOtherUsers] = useState<OtherUserPosition[]>([]);
   const [currentUserPosition, setCurrentUserPosition] = useState<number>(0);
-
   // Colors for different users
   const userColors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94'];
 
@@ -197,7 +196,7 @@ export function Journey() {
 
     loadData();
     loadOtherUsers();
-  }, [participantId, username, videos, refreshKey, navigate]);
+  }, [participantId, username, videos, refreshKey, navigate, condition]);
 
   useEffect(() => {
     const handleRefresh = async () => {

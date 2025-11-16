@@ -372,18 +372,12 @@ export function Player() {
           </div>
         </div>
         <div className="youtube-header-right">
-          <button className="youtube-create-button" aria-label="Create" disabled>
-            <svg viewBox="0 0 24 24" width="24" height="24">
-              <path d="M14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2zm3-7H3v12h14v-12zm0-2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" fill="currentColor"/>
-            </svg>
-            <span>Create</span>
-          </button>
           <button 
             className="youtube-open-button" 
             onClick={handleStartQuiz}
-            aria-label="Open quiz"
+            aria-label={isGamifiedVersion(condition) ? "Generate game" : "Start quiz"}
           >
-            <span>Open</span>
+            <span>{isGamifiedVersion(condition) ? "Generate Game" : "Start Quiz"}</span>
           </button>
           <button className="youtube-header-icon" aria-label="Notifications" disabled>
             <svg viewBox="0 0 24 24" width="24" height="24">
@@ -556,9 +550,9 @@ export function Player() {
         </aside>
       </div>
 
-      {/* Quiz Sidebar */}
-      {quizVisible && (
-        <aside className="youtube-quiz-sidebar">
+      {/* Quiz Sidebar - Always render to preserve state, but hide when quizVisible is false */}
+      {video.quiz && (
+        <aside className={`youtube-quiz-sidebar ${quizVisible ? '' : 'hidden'}`}>
           {isGamifiedVersion(condition) ? (
             <GamifiedQuiz
               quiz={video.quiz}
@@ -579,6 +573,17 @@ export function Player() {
             />
           )}
         </aside>
+      )}
+
+      {/* Show Quiz button in main content when quiz is hidden */}
+      {video.quiz && !quizVisible && (
+        <button
+          className="youtube-floating-open-button"
+          onClick={handleStartQuiz}
+          aria-label={isGamifiedVersion(condition) ? "Generate game" : "Start quiz"}
+        >
+          {isGamifiedVersion(condition) ? "Generate Game" : "Start Quiz"}
+        </button>
       )}
     </div>
   );

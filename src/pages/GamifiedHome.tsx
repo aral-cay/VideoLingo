@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { getCharacterImage } from '../utils/characterAvatar';
+import { getFakeBotsWithXP } from '../utils/fakeBots';
 import './GamifiedHome.css';
 
 interface GamificationData {
@@ -18,7 +19,7 @@ interface LeaderboardEntry {
 }
 
 export function GamifiedHome() {
-  const { participantId, username, logout } = useAuth();
+  const { participantId, username, condition, logout, dayNumber } = useAuth();
   const navigate = useNavigate();
   const [gamification, setGamification] = useState<GamificationData>({
     xp: 0,
@@ -27,6 +28,7 @@ export function GamifiedHome() {
   });
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLeaderboardExpanded, setIsLeaderboardExpanded] = useState(false);
 
   useEffect(() => {
     if (!participantId) return;
@@ -123,7 +125,7 @@ export function GamifiedHome() {
         }
 
         // Combine participant data with gamification data
-        const leaderboardEntries: LeaderboardEntry[] = participantsData
+        const realParticipants: LeaderboardEntry[] = participantsData
           .map(participant => {
             const gamDataForParticipant = gamData?.find(g => g.participant_id === participant.id);
             return {
@@ -131,10 +133,18 @@ export function GamifiedHome() {
               xp: gamDataForParticipant?.xp || 0,
               participantId: participant.id,
             };
-          })
-          .sort((a, b) => b.xp - a.xp); // Sort by XP descending
+          });
 
-        setLeaderboard(leaderboardEntries);
+        // Get fake bots with their XP based on current day
+        const fakeBots = getFakeBotsWithXP(dayNumber || 1);
+
+        // Combine real participants and fake bots
+        const allLeaderboardEntries: LeaderboardEntry[] = [
+          ...realParticipants,
+          ...fakeBots,
+        ].sort((a, b) => b.xp - a.xp); // Sort by XP descending
+
+        setLeaderboard(allLeaderboardEntries);
       } catch (error) {
         console.error('Error loading leaderboard:', error);
       }
@@ -154,7 +164,7 @@ export function GamifiedHome() {
       window.removeEventListener('videoCompleted', handleRefresh);
       window.removeEventListener('focus', handleRefresh);
     };
-  }, [participantId]); // Reload when user changes or when XP updates
+  }, [participantId, dayNumber]); // Reload when user changes, XP updates, or day changes
 
   const handlePlay = () => {
     navigate('/journey');
@@ -169,7 +179,12 @@ export function GamifiedHome() {
       {/* Top Bar */}
       <header className="gamified-header">
         <div className="gamified-header-left">
-          <h1 className="app-title">VideoLingo</h1>
+          <Link 
+            to="/" 
+            className="app-title-link"
+          >
+            <h1 className="app-title">VideoLingo</h1>
+          </Link>
           <span className="header-username">Welcome, {username}!</span>
         </div>
         <div className="gamified-header-right">
@@ -218,10 +233,34 @@ export function GamifiedHome() {
           </div>
         ) : (
           <>
+        {/* Backdrop overlay for expanded leaderboard */}
+        {isLeaderboardExpanded && (
+          <div 
+            className="leaderboard-backdrop"
+            onClick={() => setIsLeaderboardExpanded(false)}
+          />
+        )}
         {/* Left Sidebar - Leaderboard */}
-        <aside className="gamified-sidebar-left">
+        <aside 
+          className={`gamified-sidebar-left ${isLeaderboardExpanded ? 'expanded' : ''}`}
+          onClick={(e) => {
+            // Prevent click from propagating when clicking inside the leaderboard
+            e.stopPropagation();
+          }}
+        >
           <div className="leaderboard-section">
-            <h3 className="leaderboard-title">🏆 Leaderboard</h3>
+            <div className="leaderboard-header">
+              <h3 className="leaderboard-title">🏆 Leaderboard</h3>
+              {leaderboard.length > 0 && (
+                <button
+                  className="leaderboard-toggle"
+                  onClick={() => setIsLeaderboardExpanded(!isLeaderboardExpanded)}
+                  aria-label={isLeaderboardExpanded ? 'Minimize leaderboard' : 'Expand leaderboard'}
+                >
+                  {isLeaderboardExpanded ? '✕' : '▼'}
+                </button>
+              )}
+            </div>
             <div className="leaderboard-content">
               {leaderboard.length === 0 ? (
                 <div className="leaderboard-empty">No players yet</div>
@@ -237,8 +276,11 @@ export function GamifiedHome() {
                       <span className={`rank ${isTopThree ? `rank-${index + 1}` : ''}`}>
                         {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
                       </span>
-                      <span className="name">{entry.username}{isCurrentUser ? ' (You)' : ''}</span>
-                      <span className="score">{entry.xp.toLocaleString()} XP</span>
+                      <span className="name" title={entry.username}>
+                        {entry.username}
+                        {isCurrentUser && <span className="you-label"> (You)</span>}
+                      </span>
+                      <span className="score">{entry.xp > 0 ? entry.xp.toLocaleString() : '0'} XP</span>
                     </div>
                   );
                 })
