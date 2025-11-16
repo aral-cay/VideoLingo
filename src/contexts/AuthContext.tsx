@@ -51,6 +51,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [participantId, username, cohort, condition, dayNumber]);
 
+  // Re-initialize tracking when session is restored from localStorage (page refresh/new tab)
+  useEffect(() => {
+    const initializeTrackingOnLoad = async () => {
+      // Read directly from localStorage to avoid dependency issues
+      const storedParticipantId = localStorage.getItem('currentParticipantId');
+      const storedCondition = localStorage.getItem('currentCondition') as Condition | null;
+      const storedDayNumber = localStorage.getItem('currentDayNumber');
+
+      if (storedParticipantId && storedCondition) {
+        console.log('[AuthContext] Re-initializing tracking for existing session:', {
+          participantId: storedParticipantId,
+          condition: storedCondition,
+          dayNumber: storedDayNumber
+        });
+        const { initializeTracking } = await import('../utils/tracking');
+        await initializeTracking(
+          storedParticipantId,
+          storedCondition,
+          storedDayNumber ? parseInt(storedDayNumber, 10) : 1
+        );
+      }
+    };
+
+    initializeTrackingOnLoad();
+  }, []); // Run only on mount - reads from localStorage directly
+
   const login = async (usernameInput: string, password: string): Promise<boolean> => {
     try {
       // Find participant in Supabase participants table

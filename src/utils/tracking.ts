@@ -23,10 +23,26 @@ let currentDayNumber: number = 1;
  */
 export async function startSession(participantId: string, condition: Condition, dayNumber: number = 1): Promise<string | null> {
   try {
+    // Prevent rapid duplicate session creation (React Strict Mode in development)
+    const now = Date.now();
+    if (now - lastSessionStartTime < 100) {
+      console.log(`[Tracking] Skipping duplicate session start (${now - lastSessionStartTime}ms since last)`);
+      return currentSessionId;
+    }
+    lastSessionStartTime = now;
+
+    // End any existing session first to prevent orphaned sessions
+    if (currentSessionId) {
+      console.log(`[Tracking] Ending existing session ${currentSessionId} before starting new one`);
+      await endSession('session_replaced');
+    }
+
     // Store participant info for session restarts
     currentParticipantId = participantId;
     currentCondition = condition;
     currentDayNumber = dayNumber;
+
+    console.log(`[Tracking] Attempting to start session for participant=${participantId}, condition=${condition}, day=${dayNumber}`);
 
     const { data, error } = await supabase
       .from('sessions')
@@ -40,17 +56,18 @@ export async function startSession(participantId: string, condition: Condition, 
       .single();
 
     if (error) {
-      console.error('Error starting session:', error);
+      console.error('[Tracking] Database error starting session:', error);
+      console.error('[Tracking] Error details:', JSON.stringify(error, null, 2));
       return null;
     }
 
     currentSessionId = data.id;
     sessionStartTime = Date.now();
-    
-    console.log(`[Tracking] Session started: ${currentSessionId} (day ${dayNumber}, ${condition})`);
+
+    console.log(`[Tracking] Session started successfully: ${currentSessionId} (day ${dayNumber}, ${condition})`);
     return data.id;
   } catch (error) {
-    console.error('Failed to start session:', error);
+    console.error('[Tracking] Exception in startSession:', error);
     return null;
   }
 }
@@ -88,33 +105,64 @@ export async function endSession(reason: string = 'normal'): Promise<void> {
 
 /**
  * End session synchronously (for beforeunload)
- * Uses a synchronous approach since async doesn't work in beforeunload
+ * Uses sendBeacon for reliable delivery even during page unload
  */
 function endSessionSync(reason: string = 'page_unload'): void {
   if (!currentSessionId) return;
 
   const duration = sessionStartTime ? Date.now() - sessionStartTime : null;
-  
-  // Use sendBeacon for reliable delivery even during page unload
-  const data = JSON.stringify({
+  const sessionIdToEnd = currentSessionId;
+
+  // Store pending session end in localStorage for recovery if sendBeacon fails
+  const pendingEnd = {
+    sessionId: sessionIdToEnd,
     ended_at: new Date().toISOString(),
     duration_ms: duration,
     ended_reason: reason,
-  });
-  
-  // Note: In production, you might want to use a dedicated endpoint for this
-  // For now, we'll try the async version and hope it completes
-  supabase
-    .from('sessions')
-    .update({
-      ended_at: new Date().toISOString(),
+  };
+  localStorage.setItem('pendingSessionEnd', JSON.stringify(pendingEnd));
+
+  // Use sendBeacon with Supabase REST API for reliable delivery
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    const url = `${supabaseUrl}/rest/v1/sessions?id=eq.${sessionIdToEnd}`;
+    const body = JSON.stringify({
+      ended_at: pendingEnd.ended_at,
       duration_ms: duration,
       ended_reason: reason,
-    })
-    .eq('id', currentSessionId);
-  
-  console.log(`[Tracking] Session ended (sync): ${currentSessionId}, duration: ${duration}ms, reason: ${reason}`);
-  
+    });
+
+    // Create blob with proper headers for Supabase
+    const blob = new Blob([body], { type: 'application/json' });
+
+    // sendBeacon sends POST, but we need PATCH for Supabase updates
+    // Use fetch with keepalive as fallback
+    try {
+      fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Prefer': 'return=minimal',
+        },
+        body: body,
+        keepalive: true, // Allows request to outlive the page
+      }).then(() => {
+        // Clear pending if successful
+        localStorage.removeItem('pendingSessionEnd');
+      }).catch(() => {
+        // Keep pending for retry on next load
+      });
+    } catch (e) {
+      console.error('[Tracking] Failed to send session end:', e);
+    }
+  }
+
+  console.log(`[Tracking] Session ended (sync): ${sessionIdToEnd}, duration: ${duration}ms, reason: ${reason}`);
+
   currentSessionId = null;
   sessionStartTime = null;
 }
@@ -275,27 +323,75 @@ export async function trackEvent(
 
 // Track if we've already set up event listeners
 let trackingInitialized = false;
+// Track last session start time to prevent rapid duplicate sessions (React Strict Mode)
+let lastSessionStartTime: number = 0;
+
+/**
+ * Process any pending session ends that didn't complete (e.g., from page close)
+ */
+async function processPendingSessionEnd(): Promise<void> {
+  const pendingData = localStorage.getItem('pendingSessionEnd');
+  if (!pendingData) return;
+
+  try {
+    const pending = JSON.parse(pendingData);
+    console.log('[Tracking] Found pending session end, processing:', pending);
+
+    const { error } = await supabase
+      .from('sessions')
+      .update({
+        ended_at: pending.ended_at,
+        duration_ms: pending.duration_ms,
+        ended_reason: pending.ended_reason,
+      })
+      .eq('id', pending.sessionId);
+
+    if (error) {
+      console.error('[Tracking] Error processing pending session end:', error);
+    } else {
+      console.log('[Tracking] Successfully processed pending session end');
+      localStorage.removeItem('pendingSessionEnd');
+    }
+  } catch (e) {
+    console.error('[Tracking] Failed to parse pending session end:', e);
+    localStorage.removeItem('pendingSessionEnd');
+  }
+}
 
 /**
  * Initialize tracking when user logs in
  */
 export async function initializeTracking(participantId: string, condition: Condition, dayNumber: number = 1): Promise<void> {
+  // Process any pending session ends from previous page close
+  await processPendingSessionEnd();
+
   // Start new session
   await startSession(participantId, condition, dayNumber);
-  
+
   // Only set up event listeners once
   if (!trackingInitialized) {
     // Track page visibility changes
     const handleVisibilityChange = async () => {
+      console.log(`[Tracking] Visibility changed: hidden=${document.hidden}, participantId=${currentParticipantId}, condition=${currentCondition}`);
+
       if (document.hidden) {
         // Tab hidden/minimized - end current session
-        await endSession('tab_hidden').catch(err => 
+        console.log('[Tracking] Tab hidden - ending session...');
+        await endSession('tab_hidden').catch(err =>
           console.error('Failed to end session on visibility change:', err)
         );
       } else {
         // Tab visible again - start new session if we have participant info
+        console.log('[Tracking] Tab visible - checking for session restart...');
         if (currentParticipantId && currentCondition) {
+          console.log('[Tracking] Restarting session...');
           await startSession(currentParticipantId, currentCondition, currentDayNumber);
+        } else {
+          console.warn('[Tracking] Cannot restart session - missing participant info:', {
+            participantId: currentParticipantId,
+            condition: currentCondition,
+            dayNumber: currentDayNumber
+          });
         }
       }
     };
