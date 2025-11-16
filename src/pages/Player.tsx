@@ -167,7 +167,12 @@ export function Player() {
   };
 
   const handleReturnHome = () => {
-    navigate('/');
+    // Navigate to journey for gamified users, home for control
+    if (isGamifiedVersion(condition)) {
+      navigate('/journey');
+    } else {
+      navigate('/');
+    }
   };
 
   if (!video) {

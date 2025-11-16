@@ -70,7 +70,7 @@ export async function saveUserProgress(participantId: string, progress: UserProg
 /**
  * Check if a video is unlocked for a participant
  * First video (index 0) is always unlocked
- * Subsequent videos are unlocked when the previous video is completed
+ * Subsequent videos are unlocked when ALL previous videos in sequence are completed
  */
 export async function isVideoUnlocked(
   participantId: string,
@@ -84,8 +84,6 @@ export async function isVideoUnlocked(
   }
 
   const progress = await getUserProgress(participantId);
-
-  // STRICT CHECK: Video is unlocked ONLY if the previous video is completed
   const completedVideos = Array.isArray(progress.completedVideos) ? progress.completedVideos : [];
 
   // If no videos completed, only first video is unlocked
@@ -93,19 +91,20 @@ export async function isVideoUnlocked(
     return false;
   }
 
-  // Check if the previous video (at index - 1) is completed
-  if (videoIndex > 0 && videoIndex < allVideoIds.length) {
-    const previousVideoId = allVideoIds[videoIndex - 1];
-    const isUnlocked = completedVideos.includes(previousVideoId);
-
-    // Debug logging
-    console.log(`[Unlock] Video ${videoId} (idx ${videoIndex}): prev=${previousVideoId}, completed=[${completedVideos.join(',')}], unlocked=${isUnlocked}`);
-
-    return isUnlocked;
+  // CRITICAL FIX: Check that ALL previous videos in the CURRENT sequence are completed
+  // This prevents unlocking videos out of order due to stale data
+  for (let i = 0; i < videoIndex; i++) {
+    const requiredVideoId = allVideoIds[i];
+    if (!completedVideos.includes(requiredVideoId)) {
+      // Debug logging
+      console.log(`[Unlock] Video ${videoId} (idx ${videoIndex}): BLOCKED - missing video ${requiredVideoId} at position ${i}`);
+      return false;
+    }
   }
 
-  // Fallback: should not reach here, but be safe
-  return false;
+  // All previous videos are completed, this video is unlocked
+  console.log(`[Unlock] Video ${videoId} (idx ${videoIndex}): UNLOCKED - all previous videos completed`);
+  return true;
 }
 
 /**

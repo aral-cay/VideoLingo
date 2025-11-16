@@ -267,7 +267,7 @@ export function Journey() {
                     {/* Theme Label */}
                     {isFirstInTheme && (
                       <div className={`theme-label ${state.unlocked ? '' : 'locked-theme'}`}>
-                        Theme: {state.unlocked ? video.theme : '???'}
+                        Theme: {video.theme}
                       </div>
                     )}
 
