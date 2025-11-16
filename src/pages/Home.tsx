@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { VideoTile } from '../components/VideoTile';
 import { GamifiedHome } from './GamifiedHome';
 import { isGamifiedVersion } from '../utils/userVersion';
-import videosData from '../data/videos.json';
+import videosData from '../data/videos_batch1.json';
 import type { Video } from '../types';
 import { isVideoUnlocked, getVideoScore } from '../utils/userProgress';
 
@@ -75,7 +75,8 @@ export function Home() {
       <header className="app-header">
         <h1 className="app-title">VideoLingo</h1>
         <div className="header-user-section">
-          <span className="header-username">Welcome, Sir {username}!</span>
+          <span className="header-username">Welcome, {username}!</span>
+
           <button onClick={logout} className="logout-button">
             Logout
           </button>

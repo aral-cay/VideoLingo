@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { isGamifiedVersion } from '../utils/userVersion';
-import videosData from '../data/videos.json';
+import videosData from '../data/videos_batch1.json';
 import type { Video } from '../types';
 import { isVideoUnlocked, getVideoScore } from '../utils/userProgress';
 import { supabase } from '../lib/supabase';

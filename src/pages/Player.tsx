@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { QuizModal } from '../components/QuizModal';
 import { GamifiedQuiz } from '../components/GamifiedQuiz';
-import videosData from '../data/videos.json';
+import videosData from '../data/videos_batch1.json';
 import type { Video } from '../types';
 import lexosaLogo from '../assets/lexosa-logo.png';
 import { isVideoUnlocked, markVideoCompleted } from '../utils/userProgress';
