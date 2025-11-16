@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useStopwatch } from '../hooks/useStopwatch';
 import { useAuth } from '../contexts/AuthContext';
 import { getCharacterImage, type CharacterEmotion } from '../utils/characterAvatar';
-import { trackEvent } from '../utils/telemetry';
 import type { Quiz, QuizQuestion } from './QuizModal';
 import './GamifiedQuiz.css';
 
@@ -139,20 +138,6 @@ export function GamifiedQuiz({
     const isCorrect = selectedWords.length === correctWords.length &&
       selectedWords.every((word, idx) => word === correctWords[idx]);
 
-    // Track question response
-    if (participantId && username) {
-      trackEvent(participantId, username, 'question_response_time', 'video_player', {
-        question_index: currentQuestionIndex,
-        response_time_ms: responseTime,
-      });
-      trackEvent(participantId, username, isCorrect ? 'question_correct' : 'question_incorrect', 'video_player', {
-        question_index: currentQuestionIndex,
-      });
-      trackEvent(participantId, username, 'questions_answered', 'video_player', {
-        questions_answered: currentQuestionIndex + 1,
-        total_questions: quiz.questions.length,
-      });
-    }
 
     // Calculate XP for this question (for display) - +5 per correct answer
     if (isCorrect) {
@@ -230,14 +215,6 @@ export function GamifiedQuiz({
   };
 
   const handleHide = () => {
-    // Track quiz abandonment if quiz was started but not completed
-    if (quizStarted && !quizCompleted && participantId && username) {
-      trackEvent(participantId, username, 'quiz_completion', 'video_player', {
-        quiz_completed: false,
-        questions_answered: answers.length,
-        total_questions: quiz.questions.length,
-      });
-    }
     onVisibilityChange(false);
   };
 

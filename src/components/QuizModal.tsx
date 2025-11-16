@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useStopwatch } from '../hooks/useStopwatch';
 import { useAuth } from '../contexts/AuthContext';
-import { trackEvent } from '../utils/telemetry';
 
 export interface QuizQuestion {
   id: string;
@@ -76,20 +75,6 @@ export function QuizModal({
     const responseTime = questionStopwatch.stop();
     const isCorrect = selectedAnswer === question.correctIndex;
 
-    // Track question response
-    if (participantId && username) {
-      trackEvent(participantId, username, 'question_response_time', 'video_player', {
-        question_index: currentQuestionIndex,
-        response_time_ms: responseTime,
-      });
-      trackEvent(participantId, username, isCorrect ? 'question_correct' : 'question_incorrect', 'video_player', {
-        question_index: currentQuestionIndex,
-      });
-      trackEvent(participantId, username, 'questions_answered', 'video_player', {
-        questions_answered: currentQuestionIndex + 1,
-        total_questions: quiz.questions.length,
-      });
-    }
 
     setLastAnswerCorrect(isCorrect);
     setShowFeedback(true);
@@ -138,14 +123,6 @@ export function QuizModal({
   };
 
   const handleHide = () => {
-    // Track quiz abandonment if quiz was started but not completed
-    if (quizStarted && !quizCompleted && participantId && username) {
-      trackEvent(participantId, username, 'quiz_completion', 'video_player', {
-        quiz_completed: false,
-        questions_answered: answers.length,
-        total_questions: quiz.questions.length,
-      });
-    }
     onVisibilityChange(false);
   };
 

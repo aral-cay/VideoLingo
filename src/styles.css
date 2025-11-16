@@ -153,22 +153,6 @@ body {
   gap: 1.5rem;
 }
 
-.telemetry-link {
-  color: var(--text-color);
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  border: 1px solid var(--border-color);
-  transition: all 0.2s;
-}
-
-.telemetry-link:hover {
-  background-color: var(--bg-light);
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-}
 
 .header-username {
   font-size: 1.25rem;
@@ -670,117 +654,6 @@ body {
   background-color: var(--primary-hover);
 }
 
-/* Telemetry viewer */
-.telemetry-toggle {
-  position: fixed;
-  bottom: 2rem;
-  left: 2rem;
-  background-color: var(--text-light);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 2rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: var(--shadow-lg);
-  z-index: 100;
-  transition: background-color 0.2s;
-}
-
-.telemetry-toggle:hover {
-  background-color: var(--text-color);
-}
-
-.telemetry-viewer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 1rem;
-}
-
-.telemetry-viewer-content {
-  background-color: var(--bg-color);
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow-lg);
-  max-width: 900px;
-  width: 100%;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.telemetry-viewer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.telemetry-viewer-header h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.telemetry-close {
-  background-color: transparent;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
-  color: var(--text-color);
-  line-height: 1;
-  padding: 0;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.telemetry-viewer-actions {
-  padding: 1rem 1.5rem;
-  display: flex;
-  gap: 1rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.telemetry-viewer-actions button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.telemetry-viewer-actions button:hover {
-  background-color: var(--primary-hover);
-}
-
-.telemetry-viewer-data {
-  padding: 1.5rem;
-  overflow: auto;
-  flex: 1;
-}
-
-.telemetry-viewer-data pre {
-  font-size: 0.75rem;
-  line-height: 1.5;
-  color: var(--text-color);
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -804,9 +677,6 @@ body {
     padding: 1.5rem;
   }
 
-  .telemetry-viewer-content {
-    max-width: 100%;
-  }
 }
 
 /* YouTube Player Page Styles */

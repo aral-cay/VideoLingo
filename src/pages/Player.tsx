@@ -11,7 +11,6 @@ import { getVideoState, saveVideoState } from '../utils/videoState';
 import { saveQuizResult } from '../utils/quizResults';
 import { isGamifiedVersion } from '../utils/userVersion';
 import { addXP, saveVideoStars, calculateStars, calculateXP, updateStreak, getGamificationData, updateHearts } from '../utils/gamification';
-import { trackPageView, trackEvent, trackVisit, trackTimeToAction } from '../utils/telemetry';
 
 export function Player() {
   const { id } = useParams<{ id: string }>();
@@ -27,8 +26,6 @@ export function Player() {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [videoPaused, setVideoPaused] = useState(false);
   const [currentHearts, setCurrentHearts] = useState<number>(20);
-  const pageLoadTimeRef = useRef<number>(Date.now());
-  const quizStartTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!video || !participantId) {
@@ -57,32 +54,6 @@ export function Player() {
 
     checkUnlock();
 
-    // Track page view and visit
-    if (participantId && username && video) {
-      pageLoadTimeRef.current = Date.now();
-      trackVisit(participantId, username, 'video_player');
-      const cleanup = trackPageView(participantId, username, 'video_player', video.id);
-      
-      return () => {
-        cleanup();
-        // Save video state to Supabase
-        const saveState = async () => {
-          if (videoRef.current && video && participantId && !videoRef.current.src.includes('youtube.com')) {
-            const completionPercent =
-              videoRef.current.duration > 0
-                ? (videoRef.current.currentTime / videoRef.current.duration) * 100
-                : 0;
-            await saveVideoState(participantId, video.id, {
-              completionPercent,
-              lastPositionSec: videoRef.current.currentTime,
-              lastCaptionState: captionsEnabled,
-            });
-          }
-        };
-        saveState();
-      };
-    }
-
     return () => {
       // Save video state to Supabase
       const saveState = async () => {
@@ -106,9 +77,6 @@ export function Player() {
     if (videoRef.current) {
       videoRef.current.play();
       setVideoPaused(false);
-      if (participantId && username && video) {
-        trackEvent(participantId, username, 'video_resume', 'video_player', undefined, video.id);
-      }
     }
   };
 
@@ -116,9 +84,6 @@ export function Player() {
     if (videoRef.current) {
       videoRef.current.pause();
       setVideoPaused(true);
-      if (participantId && username && video) {
-        trackEvent(participantId, username, 'video_pause', 'video_player', undefined, video.id);
-      }
     }
   };
 
@@ -127,35 +92,12 @@ export function Player() {
   };
 
   const handleTimeUpdate = () => {
-    // Track video completion percentage
-    if (videoRef.current && participantId && username && video) {
-      const completionPercent =
-        videoRef.current.duration > 0
-          ? (videoRef.current.currentTime / videoRef.current.duration) * 100
-          : 0;
-      
-      // Track at key milestones (every 25%)
-      const milestone = Math.floor(completionPercent / 25) * 25;
-      const lastMilestoneKey = `last_milestone_${video.id}_${participantId}`;
-      const lastMilestone = localStorage.getItem(lastMilestoneKey);
-      
-      if (lastMilestone !== milestone.toString() && milestone > 0) {
-        trackEvent(participantId, username, 'video_completion_percent', 'video_player', {
-          completion_percent: milestone,
-        }, video.id);
-        localStorage.setItem(lastMilestoneKey, milestone.toString());
-      }
-    }
+    // Video time update handler
   };
 
   const handleCaptionsToggle = async () => {
     const newState = !captionsEnabled;
     setCaptionsEnabled(newState);
-    
-    // Track captions toggle
-    if (participantId && username && video) {
-      trackEvent(participantId, username, newState ? 'captions_on' : 'captions_off', 'video_player', undefined, video.id);
-    }
     
     // Save state to Supabase
     if (video && participantId && videoRef.current) {
@@ -172,18 +114,10 @@ export function Player() {
   };
 
   const handleStartQuiz = () => {
-    if (participantId && username && video) {
-      const eventType = isGamifiedVersion(condition) ? 'click_generate_game' : 'click_start_quiz';
-      trackTimeToAction(participantId, username, eventType, 'video_player', pageLoadTimeRef.current, video.id);
-      quizStartTimeRef.current = Date.now();
-    }
     setQuizVisible(true);
   };
 
   const handleQuizVisibilityChange = (visible: boolean) => {
-    if (participantId && username && video) {
-      trackEvent(participantId, username, visible ? 'popup_show' : 'popup_hide', 'video_player', undefined, video.id);
-    }
     setQuizVisible(visible);
   };
 
@@ -197,21 +131,6 @@ export function Player() {
 
     // Save quiz results and mark video as completed
     if (video && participantId && username) {
-      // Track quiz completion
-      const quizCompletionTime = quizStartTimeRef.current 
-        ? Date.now() - quizStartTimeRef.current 
-        : 0;
-      
-      trackEvent(participantId, username, 'quiz_completion', 'video_player', {
-        quiz_completed: true,
-        total_questions: score.total,
-        questions_answered: score.total,
-        score_accuracy: score.accuracy,
-      }, video.id);
-      
-      trackEvent(participantId, username, 'quiz_completion_time', 'video_player', {
-        time_to_completion_ms: quizCompletionTime,
-      }, video.id);
       const quizResults = {
         videoId: video.id,
         completedAt: Date.now(),
@@ -237,27 +156,10 @@ export function Player() {
         const xpReward = calculateXP(score.correct, score.total);
         await addXP(participantId, xpReward);
         
-        // Track gamified-specific metrics
-        const gamificationData = await getGamificationData(participantId);
-        trackEvent(participantId, username, 'xp_gained', 'video_player', {
-          xp_gained: xpReward,
-        }, video.id);
-        trackEvent(participantId, username, 'video_stars', 'video_player', {
-          video_stars: stars,
-        }, video.id);
-        trackEvent(participantId, username, 'hearts_remaining', 'video_player', {
-          hearts_remaining: gamificationData?.hearts || 0,
-        }, video.id);
-        
         // Hearts are already deducted in real-time during quiz, no need to deduct again
         
         // Update streak
         await updateStreak(participantId);
-      } else {
-        // Track control-specific metrics
-        trackEvent(participantId, username, 'score_accuracy', 'video_player', {
-          score_accuracy: score.accuracy,
-        }, video.id);
       }
       
       // Dispatch custom event to notify Home page to refresh
@@ -266,9 +168,6 @@ export function Player() {
   };
 
   const handleReturnHome = () => {
-    if (participantId && username && video) {
-      trackTimeToAction(participantId, username, 'click_return_home', 'video_player', pageLoadTimeRef.current, video.id);
-    }
     navigate('/');
   };
 

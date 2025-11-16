@@ -108,22 +108,6 @@
   gap: 2rem;
 }
 
-.telemetry-link-gamified {
-  color: #a5b4fc;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: 1px solid rgba(74, 158, 255, 0.3);
-  transition: all 0.3s;
-}
-
-.telemetry-link-gamified:hover {
-  background: rgba(74, 158, 255, 0.1);
-  border-color: rgba(74, 158, 255, 0.5);
-  color: #4a9eff;
-}
 
 .gamified-xp {
   display: flex;
@@ -210,7 +194,8 @@
   position: relative;
   z-index: 1;
   min-height: 0; /* Allow grid to shrink */
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   margin-bottom: -4rem;
 }
 
@@ -219,7 +204,7 @@
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   border-radius: 20px;
-  padding: 1.5rem;
+  padding: 1.25rem;
   border: 2px solid rgba(255, 160, 122, 0.3);
   box-shadow: 
     0 8px 32px rgba(255, 160, 122, 0.15),
@@ -227,14 +212,64 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   display: flex;
   flex-direction: column;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   overflow: hidden;
   align-self: flex-start;
   height: 400px;
   max-height: 400px;
+  cursor: default;
+  min-width: 280px;
+  max-width: 280px;
+  width: 280px;
 }
 
-.gamified-sidebar-left:hover {
+.leaderboard-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.gamified-sidebar-left.expanded {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 600px;
+  height: 80vh;
+  max-height: 700px;
+  z-index: 1000;
+  cursor: default;
+  animation: expandLeaderboard 0.3s ease;
+}
+
+@keyframes expandLeaderboard {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.gamified-sidebar-left:hover:not(.expanded) {
   border-color: rgba(255, 160, 122, 0.5);
   box-shadow: 
     0 12px 40px rgba(255, 160, 122, 0.25),
@@ -251,12 +286,53 @@
   flex: 1;
 }
 
+.leaderboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
 .leaderboard-title {
   font-size: 1.8rem;
   font-weight: 700;
   text-align: center;
   color: #2d1810;
   letter-spacing: 0.5px;
+  flex: 1;
+  margin: 0;
+}
+
+.leaderboard-toggle {
+  background: rgba(255, 160, 122, 0.2);
+  border: 2px solid rgba(255, 160, 122, 0.4);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #2d1810;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.leaderboard-toggle:hover {
+  background: rgba(255, 160, 122, 0.4);
+  border-color: rgba(255, 160, 122, 0.6);
+  transform: scale(1.1);
+}
+
+.gamified-sidebar-left.expanded .leaderboard-toggle {
+  background: rgba(255, 107, 107, 0.2);
+  border-color: rgba(255, 107, 107, 0.4);
+}
+
+.gamified-sidebar-left.expanded .leaderboard-toggle:hover {
+  background: rgba(255, 107, 107, 0.4);
+  border-color: rgba(255, 107, 107, 0.6);
 }
 
 .leaderboard-content {
@@ -265,7 +341,14 @@
   gap: 0.75rem;
   max-height: 300px;
   overflow-y: auto;
+  overflow-x: hidden;
   padding-right: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.gamified-sidebar-left.expanded .leaderboard-content {
+  max-height: calc(80vh - 120px);
 }
 
 .leaderboard-content::-webkit-scrollbar {
@@ -290,13 +373,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 1rem;
+  padding: 1rem 0.75rem;
   background: rgba(255, 245, 235, 0.8);
   border-radius: 15px;
   border: 2px solid rgba(255, 160, 122, 0.3);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  gap: 0.4rem;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 50px;
 }
 
 .leaderboard-item::before {
@@ -334,9 +422,10 @@
 .rank {
   font-weight: 700;
   color: #ff6b6b;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   text-shadow: 0 1px 3px rgba(255, 107, 107, 0.4);
-  min-width: 40px;
+  min-width: 30px;
+  flex-shrink: 0;
   text-align: center;
 }
 
@@ -357,10 +446,29 @@
 
 .name {
   flex: 1;
-  text-align: center;
+  text-align: left;
   color: #2d1810;
   font-weight: 600;
-  font-size: 1.05rem;
+  font-size: 0.9rem;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+}
+
+/* Show full names in expanded leaderboard */
+.gamified-sidebar-left.expanded .name {
+  max-width: none;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.you-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  white-space: nowrap;
 }
 
 .leaderboard-item.current-user {
@@ -402,10 +510,12 @@
 .score {
   font-weight: 700;
   color: #8b5a3c;
-  font-size: 1.1rem;
+  font-size: 0.85rem;
   text-shadow: 0 1px 2px rgba(139, 90, 60, 0.3);
-  min-width: 80px;
+  min-width: 60px;
   text-align: right;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .leaderboard-item.current-user .score {
