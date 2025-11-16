@@ -6,6 +6,7 @@ import videosData from '../data/videos.json';
 import type { Video } from '../types';
 import { isVideoUnlocked, getVideoScore } from '../utils/userProgress';
 import { supabase } from '../lib/supabase';
+import { getCharacterImage } from '../utils/characterAvatar';
 import './Journey.css';
 
 interface GamificationData {
@@ -192,7 +193,7 @@ export function Journey() {
 
     loadData();
     loadOtherUsers();
-  }, [participantId, username, videos, refreshKey, navigate]);
+  }, [participantId, username, videos, refreshKey, navigate, condition]);
 
   useEffect(() => {
     const handleRefresh = async () => {
