@@ -4,6 +4,25 @@ Contextual and Gamified Language Learning
 
 A web application for learning languages through video content with integrated quizzes. Features a futuristic dark theme UI and YouTube-style video player interface.
 
+## Screenshots
+
+> **Note:** Screenshot images should be added to `docs/images/` directory:
+> - `gamified-home.png` - Gamified home page with leaderboard, character, XP, hearts, and Play button
+> - `learning-journey.png` - Learning journey page showing progress through video lessons
+> - `video-player-quiz.png` - Video player with integrated quiz sidebar
+
+### Gamified Home Page
+![Gamified Home Page](docs/images/gamified-home.png)
+The gamified home page features a leaderboard, character avatar, XP and hearts display, streak counter, and a prominent Play button.
+
+### Learning Journey
+![Learning Journey](docs/images/learning-journey.png)
+The learning journey page shows your progress through video lessons with unlockable themes, star ratings, and position tracking for you and other players.
+
+### Video Player with Quiz
+![Video Player with Quiz](docs/images/video-player-quiz.png)
+The YouTube-style video player with integrated quiz sidebar. Users can watch videos and complete word-ordering quizzes to test their understanding.
+
 ## Features
 
 - **Login System**: Secure authentication with user profiles (Aral, Kabir, Luca)
