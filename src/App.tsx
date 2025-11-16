@@ -6,6 +6,7 @@ import { Home } from './pages/Home';
 import { GamifiedHome } from './pages/GamifiedHome';
 import { Journey } from './pages/Journey';
 import { Player } from './pages/Player';
+import { TelemetryViewer } from './pages/TelemetryViewer';
 import './styles.css';
 
 function App() {
@@ -35,6 +36,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Player />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/telemetry"
+            element={
+              <ProtectedRoute>
+                <TelemetryViewer />
               </ProtectedRoute>
             }
           />

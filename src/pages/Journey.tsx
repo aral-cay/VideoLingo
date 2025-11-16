@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { isGamifiedVersion } from '../utils/userVersion';
@@ -6,7 +6,11 @@ import videosData from '../data/videos.json';
 import type { Video } from '../types';
 import { isVideoUnlocked, getVideoScore } from '../utils/userProgress';
 import { supabase } from '../lib/supabase';
+<<<<<<< HEAD
 import { getCharacterImage } from '../utils/characterAvatar';
+=======
+import { trackTimeToAction } from '../utils/telemetry';
+>>>>>>> 2640c46 (Add comprehensive telemetry tracking system and character avatars)
 import './Journey.css';
 
 interface GamificationData {
@@ -30,7 +34,7 @@ export function Journey() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [otherUsers, setOtherUsers] = useState<OtherUserPosition[]>([]);
   const [currentUserPosition, setCurrentUserPosition] = useState<number>(0);
-
+  const journeyLoadTimeRef = useRef<number>(Date.now());
   // Colors for different users
   const userColors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94'];
 
@@ -235,6 +239,9 @@ export function Journey() {
 
   const handleVideoClick = (video: Video, unlocked: boolean) => {
     if (unlocked) {
+      if (participantId && username) {
+        trackTimeToAction(participantId, username, 'click_start', 'home', journeyLoadTimeRef.current);
+      }
       navigate(`/player/${video.id}`);
     }
   };

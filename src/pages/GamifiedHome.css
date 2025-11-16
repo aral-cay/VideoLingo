@@ -72,6 +72,11 @@
   gap: 1.5rem;
 }
 
+.app-title-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 /* Use same styles as control version */
 .gamified-header .app-title {
   font-size: 2rem;
@@ -101,6 +106,23 @@
   display: flex;
   align-items: center;
   gap: 2rem;
+}
+
+.telemetry-link-gamified {
+  color: #a5b4fc;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(74, 158, 255, 0.3);
+  transition: all 0.3s;
+}
+
+.telemetry-link-gamified:hover {
+  background: rgba(74, 158, 255, 0.1);
+  border-color: rgba(74, 158, 255, 0.5);
+  color: #4a9eff;
 }
 
 .gamified-xp {

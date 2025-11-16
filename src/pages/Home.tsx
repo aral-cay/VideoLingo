@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { VideoTile } from '../components/VideoTile';
 import { GamifiedHome } from './GamifiedHome';
@@ -7,6 +7,7 @@ import { isGamifiedVersion } from '../utils/userVersion';
 import videosData from '../data/videos.json';
 import type { Video } from '../types';
 import { isVideoUnlocked, getVideoScore } from '../utils/userProgress';
+import { trackPageView, trackEvent, trackVisit, trackTimeToAction } from '../utils/telemetry';
 
 export function Home() {
   const { participantId, username, condition, logout } = useAuth();
@@ -22,6 +23,18 @@ export function Home() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [videoStates, setVideoStates] = useState<Map<string, { unlocked: boolean; score: number | null }>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
+  const pageLoadTimeRef = useRef<number>(Date.now());
+
+  // Track page view and time on page
+  useEffect(() => {
+    if (!participantId || !username) return;
+
+    pageLoadTimeRef.current = Date.now();
+    trackVisit(participantId, username, 'home');
+    const cleanup = trackPageView(participantId, username, 'home');
+
+    return cleanup;
+  }, [participantId, username]);
 
   // Load video states from Supabase
   useEffect(() => {
@@ -75,6 +88,9 @@ export function Home() {
       <header className="app-header">
         <h1 className="app-title">VideoLingo</h1>
         <div className="header-user-section">
+          <Link to="/telemetry" className="telemetry-link">
+            View Telemetry
+          </Link>
           <span className="header-username">Welcome, {username}!</span>
           <button onClick={logout} className="logout-button">
             Logout
@@ -121,6 +137,11 @@ export function Home() {
                   isLocked={!state.unlocked}
                   highestScore={state.score}
                   totalQuestions={totalQuestions}
+                  onWatchClick={() => {
+                    if (participantId && username && state.unlocked) {
+                      trackTimeToAction(participantId, username, 'click_watch', 'home', pageLoadTimeRef.current);
+                    }
+                  }}
                 />
               );
             })}

@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { getCharacterImage } from '../utils/characterAvatar';
+import { trackPageView, trackEvent, trackVisit, trackLeaderboardView, trackTimeToAction } from '../utils/telemetry';
 import './GamifiedHome.css';
 
 interface GamificationData {
@@ -27,6 +28,19 @@ export function GamifiedHome() {
   });
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const pageLoadTimeRef = useRef<number>(Date.now());
+  const leaderboardViewStartRef = useRef<number | null>(null);
+
+  // Track page view and time on page
+  useEffect(() => {
+    if (!participantId || !username) return;
+
+    pageLoadTimeRef.current = Date.now();
+    trackVisit(participantId, username, 'home');
+    const cleanup = trackPageView(participantId, username, 'home');
+
+    return cleanup;
+  }, [participantId, username]);
 
   useEffect(() => {
     if (!participantId) return;
@@ -157,6 +171,9 @@ export function GamifiedHome() {
   }, [participantId]); // Reload when user changes or when XP updates
 
   const handlePlay = () => {
+    if (participantId && username) {
+      trackTimeToAction(participantId, username, 'click_play', 'home', pageLoadTimeRef.current);
+    }
     navigate('/journey');
   };
 
@@ -169,10 +186,19 @@ export function GamifiedHome() {
       {/* Top Bar */}
       <header className="gamified-header">
         <div className="gamified-header-left">
-          <h1 className="app-title">VideoLingo</h1>
+          <Link 
+            to="/" 
+            className="app-title-link"
+            onClick={() => participantId && username && trackEvent(participantId, username, 'click_home', 'home')}
+          >
+            <h1 className="app-title">VideoLingo</h1>
+          </Link>
           <span className="header-username">Welcome, {username}!</span>
         </div>
         <div className="gamified-header-right">
+          <Link to="/telemetry" className="telemetry-link-gamified">
+            View Telemetry
+          </Link>
           <div className="gamified-xp">
             <span className="xp-label">XP</span>
             <span className="xp-value">{gamification.xp}</span>
@@ -219,7 +245,21 @@ export function GamifiedHome() {
         ) : (
           <>
         {/* Left Sidebar - Leaderboard */}
-        <aside className="gamified-sidebar-left">
+        <aside 
+          className="gamified-sidebar-left"
+          onMouseEnter={() => {
+            if (participantId && username && !leaderboardViewStartRef.current) {
+              leaderboardViewStartRef.current = Date.now();
+            }
+          }}
+          onMouseLeave={() => {
+            if (participantId && username && leaderboardViewStartRef.current) {
+              const cleanup = trackLeaderboardView(participantId, username, leaderboardViewStartRef.current);
+              cleanup();
+              leaderboardViewStartRef.current = null;
+            }
+          }}
+        >
           <div className="leaderboard-section">
             <h3 className="leaderboard-title">🏆 Leaderboard</h3>
             <div className="leaderboard-content">
