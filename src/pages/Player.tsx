@@ -231,7 +231,7 @@ export function Player() {
       };
 
       // Save to Supabase (quiz tables handle their own metrics)
-      await saveQuizResult(participantId, quizResults);
+      await saveQuizResult(participantId, condition, quizResults);
 
       // Mark video as completed and unlock next video
       await markVideoCompleted(participantId, condition, video.id, score.correct, score.total);

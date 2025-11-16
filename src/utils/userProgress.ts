@@ -132,8 +132,9 @@ export async function markVideoCompleted(
   }
 
   // Update highest score (store the number of correct answers)
-  const currentHighScore = progress.videoScores[videoId] || 0;
-  if (score > currentHighScore) {
+  const currentHighScore = progress.videoScores[videoId];
+  // Save score if it's the first attempt OR if it's higher than previous
+  if (currentHighScore === undefined || score > currentHighScore) {
     progress.videoScores[videoId] = score;
   }
 
@@ -145,7 +146,8 @@ export async function markVideoCompleted(
  */
 export async function getVideoScore(participantId: string, condition: Condition, videoId: string): Promise<number | null> {
   const progress = await getUserProgress(participantId, condition);
-  return progress.videoScores[videoId] || null;
+  // Use ?? instead of || to properly handle score of 0
+  return progress.videoScores[videoId] ?? null;
 }
 
 /**
