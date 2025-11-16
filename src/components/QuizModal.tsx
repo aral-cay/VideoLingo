@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useStopwatch } from '../hooks/useStopwatch';
-import { useAuth } from '../contexts/AuthContext';
 
 export interface QuizQuestion {
   id: string;
@@ -37,7 +36,6 @@ export function QuizModal({
   isVisible,
   onVisibilityChange,
 }: QuizModalProps) {
-  const { participantId, username, condition } = useAuth();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [availableWords, setAvailableWords] = useState<string[]>([]);
@@ -159,8 +157,18 @@ export function QuizModal({
 
   const handleSubmit = () => {
     const question = quiz.questions[currentQuestionIndex];
+    const correctAnswer = question.choices[question.correctIndex];
+    const correctWords = correctAnswer
+      .split(/\s+/)
+      .map(w => w.trim())
+      .filter(w => w.length > 0);
+    
     questionStopwatch.stop();
-    const isCorrect = selectedAnswer === question.correctIndex;
+    const isCorrect = selectedWords.length === correctWords.length &&
+      selectedWords.every((word, idx) => word === correctWords[idx]);
+
+    // Save feedback state
+    setSavedFeedback(prev => new Map(prev).set(question.id, { isCorrect, checked: true }));
 
     setLastAnswerCorrect(isCorrect);
     setShowFeedback(true);
@@ -169,7 +177,13 @@ export function QuizModal({
   const handleContinue = () => {
     const question = quiz.questions[currentQuestionIndex];
     const responseTime = questionStopwatch.getElapsed();
-    const isCorrect = selectedAnswer === question.correctIndex;
+    const correctAnswer = question.choices[question.correctIndex];
+    const correctWords = correctAnswer
+      .split(/\s+/)
+      .map(w => w.trim())
+      .filter(w => w.length > 0);
+    const isCorrect = selectedWords.length === correctWords.length &&
+      selectedWords.every((word, idx) => word === correctWords[idx]);
 
     const answerData = {
       questionId: question.id,
@@ -248,9 +262,9 @@ export function QuizModal({
     onVisibilityChange(false);
   };
 
-  const handleShow = () => {
-    onVisibilityChange(true);
-  };
+  // const handleShow = () => {
+  //   onVisibilityChange(true);
+  // };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape' && isVisible) {

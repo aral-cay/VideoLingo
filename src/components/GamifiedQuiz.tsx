@@ -30,7 +30,7 @@ export function GamifiedQuiz({
   participantId,
   onHeartsUpdate,
 }: GamifiedQuizProps) {
-  const { username, condition } = useAuth();
+  const { username } = useAuth();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [availableWords, setAvailableWords] = useState<string[]>([]);
@@ -303,9 +303,9 @@ export function GamifiedQuiz({
     onVisibilityChange(false);
   };
 
-  const handleShow = () => {
-    onVisibilityChange(true);
-  };
+  // const handleShow = () => {
+  //   onVisibilityChange(true);
+  // };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
