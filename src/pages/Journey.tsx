@@ -29,7 +29,8 @@ export function Journey() {
   const [gamification, setGamification] = useState<GamificationData>({ xp: 0, hearts: 20 });
   const [refreshKey, setRefreshKey] = useState(0);
   const [otherUsers, setOtherUsers] = useState<OtherUserPosition[]>([]);
-  
+  const [currentUserPosition, setCurrentUserPosition] = useState<number>(0);
+
   // Colors for different users
   const userColors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94'];
 
@@ -94,6 +95,33 @@ export function Journey() {
       }
 
       setVideoStates(states);
+
+      // Calculate current user's position
+      try {
+        const { data: progressData } = await supabase
+          .from('user_progress')
+          .select('completed_videos')
+          .eq('participant_id', participantId)
+          .single();
+
+        const completedVideos = (progressData?.completed_videos as string[]) || [];
+
+        // Find the next video they're working on (last completed + 1, or first video if none completed)
+        let position = 0;
+        if (completedVideos.length > 0) {
+          let lastCompletedIndex = -1;
+          for (let j = videos.length - 1; j >= 0; j--) {
+            if (completedVideos.includes(videos[j].id)) {
+              lastCompletedIndex = j;
+              break;
+            }
+          }
+          position = Math.min(lastCompletedIndex + 1, videos.length - 1);
+        }
+        setCurrentUserPosition(position);
+      } catch (error) {
+        console.error('Error loading current user position:', error);
+      }
     };
 
     const loadOtherUsers = async () => {
@@ -251,6 +279,7 @@ export function Journey() {
 
               // Check if any other users are at this position
               const usersAtThisPosition = otherUsers.filter(u => u.position === index);
+              const isCurrentUserHere = currentUserPosition === index;
 
               return (
                 <div key={video.id} className="video-node-container" data-index={index}>
@@ -271,9 +300,26 @@ export function Journey() {
                       </div>
                     )}
 
-                    {/* Other users at this position */}
-                    {usersAtThisPosition.length > 0 && (
+                    {/* Users at this position */}
+                    {(isCurrentUserHere || usersAtThisPosition.length > 0) && (
                       <div className="other-users-at-node">
+                        {/* Current user first */}
+                        {isCurrentUserHere && (
+                          <div
+                            className="other-user-indicator current-user"
+                            title="You"
+                          >
+                            <div className="other-user-avatar current-user-avatar">
+                              <img
+                                src={getCharacterImage(username, 'profile')}
+                                alt="You"
+                                className="other-user-avatar-image"
+                              />
+                            </div>
+                            <div className="other-user-name current-user-name">You</div>
+                          </div>
+                        )}
+                        {/* Then other users */}
                         {usersAtThisPosition.map((otherUser) => (
                           <div
                             key={otherUser.participantId}

@@ -533,6 +533,23 @@
   object-fit: cover;
 }
 
+/* Current User Avatar - Bigger */
+.current-user-avatar {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 107, 107, 0.8);
+  box-shadow:
+    0 3px 12px rgba(255, 107, 107, 0.4),
+    0 0 20px rgba(255, 107, 107, 0.3);
+}
+
+.current-user-avatar:hover {
+  transform: scale(1.1);
+  box-shadow:
+    0 5px 16px rgba(255, 107, 107, 0.6),
+    0 0 25px rgba(255, 107, 107, 0.4);
+}
+
 .other-user-avatar-small {
   width: 24px;
   height: 24px;
@@ -561,6 +578,15 @@
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 160, 122, 0.3);
   box-shadow: 0 2px 6px rgba(255, 160, 122, 0.2);
+}
+
+/* Current User Name - "You" label */
+.current-user-name {
+  background: rgba(255, 107, 107, 0.15);
+  border: 1px solid rgba(255, 107, 107, 0.5);
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+  color: #d63031;
+  font-weight: 700;
 }
 
 @keyframes userBounce {
