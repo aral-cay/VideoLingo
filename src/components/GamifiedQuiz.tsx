@@ -29,6 +29,10 @@ export function GamifiedQuiz({
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [availableWords, setAvailableWords] = useState<string[]>([]);
   const [answers, setAnswers] = useState<Array<{ questionId: string; correct: boolean; responseTime: number }>>([]);
+  // Store selected words and available words for each question to preserve when navigating
+  const [savedQuestionStates, setSavedQuestionStates] = useState<Map<string, { selectedWords: string[]; availableWords: string[] }>>(new Map());
+  // Store feedback state for each question
+  const [savedFeedback, setSavedFeedback] = useState<Map<string, { isCorrect: boolean; checked: boolean }>>(new Map());
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -54,46 +58,64 @@ export function GamifiedQuiz({
     }
   }, [participantId, isVisible]);
 
-  // Initialize words for current question
+  // Initialize words for current question or restore saved state
   useEffect(() => {
     if (quizStarted && quiz.questions[currentQuestionIndex]) {
       const question = quiz.questions[currentQuestionIndex];
-      const correctAnswer = question.choices[question.correctIndex];
+      const savedState = savedQuestionStates.get(question.id);
+      const savedFeedbackState = savedFeedback.get(question.id);
       
-      // Split correct answer into words, handling punctuation
-      const correctWords = correctAnswer
-        .split(/\s+/)
-        .map(w => w.trim())
-        .filter(w => w.length > 0);
+      if (savedState) {
+        // Restore saved state
+        setSelectedWords(savedState.selectedWords);
+        setAvailableWords(savedState.availableWords);
+      } else {
+        // Initialize new question
+        const correctAnswer = question.choices[question.correctIndex];
+        
+        // Split correct answer into words, handling punctuation
+        const correctWords = correctAnswer
+          .split(/\s+/)
+          .map(w => w.trim())
+          .filter(w => w.length > 0);
+        
+        // Get words from incorrect choices as potential distractors
+        const incorrectChoices = question.choices.filter((_, idx) => idx !== question.correctIndex);
+        const distractorWords = incorrectChoices
+          .flatMap(choice => 
+            choice
+              .split(/\s+/)
+              .map(w => w.trim())
+              .filter(w => w.length > 0)
+          )
+          .filter(word => !correctWords.includes(word)); // Remove words that are already in correct answer
+        
+        // Select 2-3 random distractors
+        const shuffledDistractors = [...new Set(distractorWords)].sort(() => Math.random() - 0.5);
+        const selectedDistractors = shuffledDistractors.slice(0, Math.min(3, shuffledDistractors.length));
+        
+        // Create word bank with correct words + 2-3 distractors
+        const wordBank = [...correctWords, ...selectedDistractors];
+        const shuffled = [...wordBank].sort(() => Math.random() - 0.5);
+        
+        setAvailableWords(shuffled);
+        setSelectedWords([]);
+      }
       
-      // Get words from incorrect choices as potential distractors
-      const incorrectChoices = question.choices.filter((_, idx) => idx !== question.correctIndex);
-      const distractorWords = incorrectChoices
-        .flatMap(choice => 
-          choice
-            .split(/\s+/)
-            .map(w => w.trim())
-            .filter(w => w.length > 0)
-        )
-        .filter(word => !correctWords.includes(word)); // Remove words that are already in correct answer
+      if (savedFeedbackState?.checked) {
+        setShowFeedback(true);
+        setLastAnswerCorrect(savedFeedbackState.isCorrect);
+        setCharacterEmotion(savedFeedbackState.isCorrect ? 'happy' : 'sad');
+      } else {
+        setShowFeedback(false);
+        setLastAnswerCorrect(null);
+        setCharacterEmotion('neutral');
+      }
       
-      // Select 2-3 random distractors
-      const shuffledDistractors = [...new Set(distractorWords)].sort(() => Math.random() - 0.5);
-      const selectedDistractors = shuffledDistractors.slice(0, Math.min(3, shuffledDistractors.length));
-      
-      // Create word bank with correct words + 2-3 distractors
-      const wordBank = [...correctWords, ...selectedDistractors];
-      const shuffled = [...wordBank].sort(() => Math.random() - 0.5);
-      
-      setAvailableWords(shuffled);
-      setSelectedWords([]);
-      setShowFeedback(false);
-      setLastAnswerCorrect(null);
       setXpGained(0);
-      setCharacterEmotion('neutral');
       questionStopwatch.start();
     }
-  }, [currentQuestionIndex, quizStarted, quiz.questions]);
+  }, [currentQuestionIndex, quizStarted, quiz.questions, savedQuestionStates, savedFeedback]);
 
   useEffect(() => {
     if (isVisible && !quizStarted) {
@@ -114,7 +136,15 @@ export function GamifiedQuiz({
     newAvailable.splice(index, 1);
     setAvailableWords(newAvailable);
     
-    setSelectedWords([...selectedWords, word]);
+    const newSelected = [...selectedWords, word];
+    setSelectedWords(newSelected);
+    
+    // Save state immediately
+    const question = quiz.questions[currentQuestionIndex];
+    setSavedQuestionStates(prev => new Map(prev).set(question.id, {
+      selectedWords: newSelected,
+      availableWords: newAvailable
+    }));
   };
 
   const handleRemoveWord = (word: string, index: number) => {
@@ -123,7 +153,15 @@ export function GamifiedQuiz({
     newSelected.splice(index, 1);
     setSelectedWords(newSelected);
     
-    setAvailableWords([...availableWords, word]);
+    const newAvailable = [...availableWords, word];
+    setAvailableWords(newAvailable);
+    
+    // Save state immediately
+    const question = quiz.questions[currentQuestionIndex];
+    setSavedQuestionStates(prev => new Map(prev).set(question.id, {
+      selectedWords: newSelected,
+      availableWords: newAvailable
+    }));
   };
 
   const handleCheck = () => {
@@ -164,6 +202,9 @@ export function GamifiedQuiz({
       }
     }
 
+    // Save feedback state
+    setSavedFeedback(prev => new Map(prev).set(question.id, { isCorrect, checked: true }));
+
     setLastAnswerCorrect(isCorrect);
     setShowFeedback(true);
   };
@@ -185,19 +226,45 @@ export function GamifiedQuiz({
       responseTime,
     };
 
-    const updatedAnswers = [...answers, answerData];
-
-    setShowFeedback(false);
-    setLastAnswerCorrect(null);
-    setXpGained(0);
+    // Check if this answer was already recorded
+    const existingAnswerIndex = answers.findIndex(a => a.questionId === question.id);
+    let updatedAnswers;
+    if (existingAnswerIndex >= 0) {
+      updatedAnswers = [...answers];
+      updatedAnswers[existingAnswerIndex] = answerData;
+    } else {
+      updatedAnswers = [...answers, answerData];
+    }
+    setAnswers(updatedAnswers);
 
     if (currentQuestionIndex < quiz.questions.length - 1) {
-      setAnswers(updatedAnswers);
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedWords([]);
-      questionStopwatch.start();
     } else {
       handleComplete(updatedAnswers);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      // Save current state before navigating
+      const question = quiz.questions[currentQuestionIndex];
+      setSavedQuestionStates(prev => new Map(prev).set(question.id, {
+        selectedWords,
+        availableWords
+      }));
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentQuestionIndex < quiz.questions.length - 1) {
+      // Save current state before navigating
+      const question = quiz.questions[currentQuestionIndex];
+      setSavedQuestionStates(prev => new Map(prev).set(question.id, {
+        selectedWords,
+        availableWords
+      }));
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
@@ -396,22 +463,42 @@ export function GamifiedQuiz({
 
           {/* Submit/Continue button */}
           <div className="gamified-quiz-actions">
-            {!showFeedback ? (
+            <div className="gamified-quiz-navigation">
               <button
-                className="gamified-quiz-check-button"
-                onClick={handleCheck}
-                disabled={!canSubmit}
+                className="gamified-quiz-nav-button gamified-quiz-prev-button"
+                onClick={handlePrevious}
+                disabled={currentQuestionIndex === 0}
+                aria-label="Previous question"
               >
-                Check
+                ← Previous
               </button>
-            ) : (
+              <div className="gamified-quiz-main-action">
+                {!showFeedback ? (
+                  <button
+                    className="gamified-quiz-check-button"
+                    onClick={handleCheck}
+                    disabled={!canSubmit}
+                  >
+                    Check
+                  </button>
+                ) : (
+                  <button
+                    className="gamified-quiz-check-button"
+                    onClick={handleContinue}
+                  >
+                    {currentQuestionIndex < quiz.questions.length - 1 ? 'Continue' : 'Finish'}
+                  </button>
+                )}
+              </div>
               <button
-                className="gamified-quiz-check-button"
-                onClick={handleContinue}
+                className="gamified-quiz-nav-button gamified-quiz-next-nav-button"
+                onClick={handleNext}
+                disabled={currentQuestionIndex === quiz.questions.length - 1}
+                aria-label="Next question"
               >
-                {currentQuestionIndex < quiz.questions.length - 1 ? 'Continue' : 'Finish'}
+                Next →
               </button>
-            )}
+            </div>
           </div>
         </div>
       </div>

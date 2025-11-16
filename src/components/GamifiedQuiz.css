@@ -475,19 +475,72 @@
   flex-shrink: 0;
 }
 
+.gamified-quiz-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.gamified-quiz-main-action {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.gamified-quiz-nav-button {
+  background: rgba(74, 158, 255, 0.15);
+  border: 1px solid rgba(74, 158, 255, 0.3);
+  color: #4a9eff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+.gamified-quiz-nav-button:hover:not(:disabled) {
+  background: rgba(74, 158, 255, 0.25);
+  border-color: rgba(74, 158, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+}
+
+.gamified-quiz-nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(74, 158, 255, 0.05);
+  border-color: rgba(74, 158, 255, 0.15);
+  color: #6b7280;
+}
+
+.gamified-quiz-nav-button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 .gamified-quiz-check-button {
   background: linear-gradient(135deg, rgba(74, 158, 255, 0.3), rgba(124, 58, 237, 0.3));
   border: 2px solid rgba(74, 158, 255, 0.5);
   color: #e0e7ff;
-  padding: 0.75rem 2rem;
-  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
   font-weight: 700;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  min-width: 180px;
+  letter-spacing: 1px;
+  min-width: 120px;
+  max-width: 100%;
+  white-space: nowrap;
 }
 
 .gamified-quiz-check-button:hover:not(:disabled) {

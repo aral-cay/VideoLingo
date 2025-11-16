@@ -35,6 +35,10 @@ export function QuizModal({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [answers, setAnswers] = useState<Array<{ questionId: string; answerIndex: number; correct: boolean; responseTime: number }>>([]);
+  // Store selected answers for each question to preserve when navigating
+  const [savedAnswers, setSavedAnswers] = useState<Map<string, number>>(new Map());
+  // Store feedback state for each question
+  const [savedFeedback, setSavedFeedback] = useState<Map<string, { isCorrect: boolean; checked: boolean }>>(new Map());
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -58,6 +62,31 @@ export function QuizModal({
     }
   }, [isVisible, currentQuestionIndex]);
 
+  // Restore saved answer when navigating to a question
+  useEffect(() => {
+    if (quizStarted && quiz.questions[currentQuestionIndex]) {
+      const question = quiz.questions[currentQuestionIndex];
+      const savedAnswer = savedAnswers.get(question.id);
+      const savedFeedbackState = savedFeedback.get(question.id);
+      
+      if (savedAnswer !== undefined) {
+        setSelectedAnswer(savedAnswer);
+      } else {
+        setSelectedAnswer(null);
+      }
+      
+      if (savedFeedbackState?.checked) {
+        setShowFeedback(true);
+        setLastAnswerCorrect(savedFeedbackState.isCorrect);
+      } else {
+        setShowFeedback(false);
+        setLastAnswerCorrect(null);
+      }
+      
+      questionStopwatch.start();
+    }
+  }, [currentQuestionIndex, quizStarted, quiz.questions, savedAnswers, savedFeedback]);
+
   const handleStartQuiz = () => {
     setQuizStarted(true);
     setCurrentQuestionIndex(0);
@@ -66,6 +95,9 @@ export function QuizModal({
 
   const handleAnswerSelect = (index: number) => {
     setSelectedAnswer(index);
+    // Save the answer immediately so it persists when navigating
+    const question = quiz.questions[currentQuestionIndex];
+    setSavedAnswers(prev => new Map(prev).set(question.id, index));
   };
 
   const handleSubmit = () => {
@@ -75,6 +107,9 @@ export function QuizModal({
     const responseTime = questionStopwatch.stop();
     const isCorrect = selectedAnswer === question.correctIndex;
 
+    // Save the answer and feedback state
+    setSavedAnswers(prev => new Map(prev).set(question.id, selectedAnswer));
+    setSavedFeedback(prev => new Map(prev).set(question.id, { isCorrect, checked: true }));
 
     setLastAnswerCorrect(isCorrect);
     setShowFeedback(true);
@@ -94,18 +129,38 @@ export function QuizModal({
       responseTime,
     };
 
-    const updatedAnswers = [...answers, answerData];
-
-    setShowFeedback(false);
-    setLastAnswerCorrect(null);
+    // Check if this answer was already recorded
+    const existingAnswerIndex = answers.findIndex(a => a.questionId === question.id);
+    let updatedAnswers;
+    if (existingAnswerIndex >= 0) {
+      updatedAnswers = [...answers];
+      updatedAnswers[existingAnswerIndex] = answerData;
+    } else {
+      updatedAnswers = [...answers, answerData];
+    }
+    setAnswers(updatedAnswers);
 
     if (currentQuestionIndex < quiz.questions.length - 1) {
-      setAnswers(updatedAnswers);
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedAnswer(null);
-      questionStopwatch.start();
     } else {
       handleComplete(updatedAnswers);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentQuestionIndex < quiz.questions.length - 1) {
+      // Save current answer before navigating
+      if (selectedAnswer !== null) {
+        const question = quiz.questions[currentQuestionIndex];
+        setSavedAnswers(prev => new Map(prev).set(question.id, selectedAnswer));
+      }
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
@@ -134,9 +189,8 @@ export function QuizModal({
     if (e.key === 'Escape' && isVisible) {
       if (quizCompleted) {
         onClose();
-      } else {
-        handleHide();
       }
+      // Hide button is disabled, so don't allow Escape to hide during quiz
     }
   };
 
@@ -201,7 +255,9 @@ export function QuizModal({
             <button
               className="quiz-hide-button"
               onClick={handleHide}
+              disabled
               aria-label="Hide quiz"
+              title="Hiding is disabled, will erase quiz progress."
             >
               Hide
             </button>
@@ -242,7 +298,9 @@ export function QuizModal({
           <button
             className="quiz-hide-button"
             onClick={handleHide}
+            disabled
             aria-label="Hide quiz"
+            title="Hiding is disabled, will erase quiz progress."
           >
             Hide
           </button>
@@ -297,24 +355,44 @@ export function QuizModal({
           )}
           
           <div className="quiz-actions">
-            {!showFeedback ? (
+            <div className="quiz-navigation">
               <button
-                className="quiz-next-button"
-                onClick={handleSubmit}
-                disabled={selectedAnswer === null}
-                aria-label="Submit answer"
+                className="quiz-nav-button quiz-prev-button"
+                onClick={handlePrevious}
+                disabled={currentQuestionIndex === 0}
+                aria-label="Previous question"
               >
-                Check
+                ← Previous
               </button>
-            ) : (
+              <div className="quiz-main-action">
+                {!showFeedback ? (
+                  <button
+                    className="quiz-next-button"
+                    onClick={handleSubmit}
+                    disabled={selectedAnswer === null}
+                    aria-label="Submit answer"
+                  >
+                    Check
+                  </button>
+                ) : (
+                  <button
+                    className="quiz-next-button"
+                    onClick={handleContinue}
+                    aria-label={isLastQuestion ? 'Submit quiz' : 'Next question'}
+                  >
+                    {isLastQuestion ? 'Finish' : 'Continue'}
+                  </button>
+                )}
+              </div>
               <button
-                className="quiz-next-button"
-                onClick={handleContinue}
-                aria-label={isLastQuestion ? 'Submit quiz' : 'Next question'}
+                className="quiz-nav-button quiz-next-nav-button"
+                onClick={handleNext}
+                disabled={currentQuestionIndex === quiz.questions.length - 1}
+                aria-label="Next question"
               >
-                {isLastQuestion ? 'Finish' : 'Continue'}
+                Next →
               </button>
-            )}
+            </div>
           </div>
         </div>
       </div>
