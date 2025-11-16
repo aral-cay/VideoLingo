@@ -117,8 +117,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setCondition(participantData.condition as Condition);
       setDayNumber(participantData.day_number || 1);
 
-      // Initialize participant progress if it doesn't exist
-      await initializeParticipantProgress(participantData.id);
+      // Initialize participant progress if it doesn't exist for this condition
+      await initializeParticipantProgress(participantData.id, participantData.condition as Condition);
 
       // Check and update streak for gamified condition on login
       const { isGamifiedCondition } = await import('../utils/studyCondition');
@@ -142,20 +142,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const initializeParticipantProgress = async (participantId: string) => {
+  const initializeParticipantProgress = async (participantId: string, condition: Condition) => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('user_progress')
         .select('id')
         .eq('participant_id', participantId)
+        .eq('condition', condition)
         .single();
 
       if (error && error.code === 'PGRST116') {
-        // No progress exists, create it
+        // No progress exists for this condition, create it
+        console.log(`[Auth] Creating new progress row for participant ${participantId} with condition ${condition}`);
         await supabase
           .from('user_progress')
           .insert({
             participant_id: participantId,
+            condition: condition,
             completed_videos: [],
             video_scores: {},
           });

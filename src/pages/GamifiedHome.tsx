@@ -18,7 +18,7 @@ interface LeaderboardEntry {
 }
 
 export function GamifiedHome() {
-  const { participantId, username, condition, logout } = useAuth();
+  const { participantId, username, logout } = useAuth();
   const navigate = useNavigate();
   const [gamification, setGamification] = useState<GamificationData>({
     xp: 0,

@@ -10,7 +10,8 @@ import { isVideoUnlocked, markVideoCompleted } from '../utils/userProgress';
 import { getVideoState, saveVideoState } from '../utils/videoState';
 import { saveQuizResult } from '../utils/quizResults';
 import { isGamifiedVersion } from '../utils/userVersion';
-import { addXP, saveVideoStars, calculateStars, calculateXP, updateStreak, getGamificationData, updateHearts } from '../utils/gamification';
+import { addXP, saveVideoStars, calculateStars, calculateXP, updateStreak } from '../utils/gamification';
+import { initializeVideoRun, updateVideoRun, trackEvent } from '../utils/tracking';
 
 export function Player() {
   const { id } = useParams<{ id: string }>();
@@ -22,10 +23,16 @@ export function Player() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [captionsEnabled, setCaptionsEnabled] = useState(false);
   const [quizVisible, setQuizVisible] = useState(false);
-  const [quizStarted, setQuizStarted] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
-  const [videoPaused, setVideoPaused] = useState(false);
-  const [currentHearts, setCurrentHearts] = useState<number>(20);
+
+  // Video run tracking refs
+  const pageStartTimeRef = useRef<number>(Date.now());
+  const quizStartTimeRef = useRef<number | null>(null);
+  const videoPauseCountRef = useRef<number>(0);
+  const videoResumeCountRef = useRef<number>(0);
+  const captionsOnCountRef = useRef<number>(0);
+  const captionsOffCountRef = useRef<number>(0);
+  const maxVideoCompletionRef = useRef<number>(0);
 
   useEffect(() => {
     if (!video || !participantId) {
@@ -33,13 +40,26 @@ export function Player() {
       return;
     }
 
+    // Reset page start time on mount
+    pageStartTimeRef.current = Date.now();
+
     // Check if video is unlocked
     const checkUnlock = async () => {
+      if (!condition) {
+        navigate('/');
+        return;
+      }
       const allVideoIds = videos.map(v => v.id);
-      const unlocked = await isVideoUnlocked(participantId, video.id, videoIndex, allVideoIds);
+      const unlocked = await isVideoUnlocked(participantId, condition, video.id, videoIndex, allVideoIds);
       if (!unlocked) {
         navigate('/');
         return;
+      }
+
+      // Initialize video run for tracking (creates if doesn't exist)
+      if (condition) {
+        await initializeVideoRun(participantId, condition, video.id, 1);
+        console.log(`[Player] Initialized video run for participant ${participantId}, video ${video.id}`);
       }
 
       // Load video state from Supabase
@@ -68,68 +88,139 @@ export function Player() {
             lastCaptionState: captionsEnabled,
           });
         }
+
+        // Update video run with cumulative metrics if user leaves
+        // Note: video_completion_pct is only captured on return home, so we don't update it here
+        if (participantId && video && !quizCompleted) {
+          await updateVideoRun(participantId, video.id, {
+            numPauses: videoPauseCountRef.current,
+            numResumes: videoResumeCountRef.current,
+            captionsOnCount: captionsOnCountRef.current,
+            captionsOffCount: captionsOffCountRef.current,
+            quizCompleted: false,
+          });
+          console.log('[Player] Updated video run on cleanup (incomplete)');
+        }
       };
       saveState();
     };
-  }, [video, navigate, captionsEnabled, participantId, videoIndex, videos]);
+  }, [video, navigate, captionsEnabled, participantId, videoIndex, videos, condition, quizCompleted]);
 
   const handlePlay = () => {
     if (videoRef.current) {
       videoRef.current.play();
-      setVideoPaused(false);
+
+      // Track resume (cumulative count)
+      videoResumeCountRef.current += 1;
+      if (participantId && condition && video) {
+        trackEvent(participantId, condition, 'video_resume', 1, {
+          videoId: video.id,
+          resumeCount: videoResumeCountRef.current,
+        });
+        
+        // Update cumulative count in database
+        updateVideoRun(participantId, video.id, {
+          numResumes: videoResumeCountRef.current,
+        });
+      }
     }
   };
 
   const handlePause = () => {
     if (videoRef.current) {
       videoRef.current.pause();
-      setVideoPaused(true);
+
+      // Track pause (cumulative count)
+      videoPauseCountRef.current += 1;
+      if (participantId && condition && video) {
+        trackEvent(participantId, condition, 'video_pause', 1, {
+          videoId: video.id,
+          pauseCount: videoPauseCountRef.current,
+          currentTime: videoRef.current.currentTime,
+        });
+        
+        // Update cumulative count in database
+        updateVideoRun(participantId, video.id, {
+          numPauses: videoPauseCountRef.current,
+        });
+      }
     }
   };
 
   const handleVideoEnd = () => {
-    // Video ended
-  };
-
-  const handleTimeUpdate = () => {
-    // Time update handler if needed
-  };
-
-  const handleCaptionsToggle = async () => {
-    const newState = !captionsEnabled;
-    setCaptionsEnabled(newState);
-    // Save state to Supabase
-    if (video && participantId && videoRef.current) {
-      const completionPercent =
-        videoRef.current.duration > 0
-          ? (videoRef.current.currentTime / videoRef.current.duration) * 100
-          : 0;
-      await saveVideoState(participantId, video.id, {
-        completionPercent,
-        lastPositionSec: videoRef.current.currentTime,
-        lastCaptionState: newState,
+    // Video ended - mark 100% completion (will be saved when they click return home)
+    maxVideoCompletionRef.current = 100;
+    if (participantId && condition && video) {
+      trackEvent(participantId, condition, 'video_completed', 1, {
+        videoId: video.id,
       });
     }
   };
 
+  const handleTimeUpdate = () => {
+    // Track video completion percentage
+    if (videoRef.current && videoRef.current.duration > 0) {
+      const currentPercent = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+      if (currentPercent > maxVideoCompletionRef.current) {
+        maxVideoCompletionRef.current = currentPercent;
+      }
+    }
+  };
+
+  // Note: Caption tracking and video completion % tracking don't work for YouTube embeds
+  // YouTube iframes don't expose these events without using YouTube IFrame Player API
+  // For now, we estimate completion based on time spent on page
+
   const handleStartQuiz = () => {
+    quizStartTimeRef.current = Date.now();
     setQuizVisible(true);
+
+    if (participantId && condition && video) {
+      const timeToStartMs = quizStartTimeRef.current - pageStartTimeRef.current;
+      
+      // Track event
+      trackEvent(participantId, condition, 'quiz_started', 1, {
+        videoId: video.id,
+        timeToStartMs,
+      });
+      
+      // Update video run with condition-specific timing
+      // For experimental: time_to_click_generate_game_ms
+      // For control: time_to_start_quiz_ms
+      if (condition === 'experimental') {
+        updateVideoRun(participantId, video.id, {
+          timeToClickGenerateGameMs: timeToStartMs,
+        });
+      } else {
+        updateVideoRun(participantId, video.id, {
+          timeToStartQuizMs: timeToStartMs,
+        });
+      }
+    }
   };
 
   const handleQuizVisibilityChange = (visible: boolean) => {
     setQuizVisible(visible);
+
+    // Track popup show/hide (event only, not stored in video_runs)
+    if (participantId && condition && video) {
+      trackEvent(participantId, condition, visible ? 'quiz_popup_show' : 'quiz_popup_hide', 1, {
+        videoId: video.id,
+      });
+    }
   };
 
   const handleQuizComplete = async (score: {
     correct: number;
     total: number;
     accuracy: number;
+    totalResponseTimeMs?: number;
+    avgResponseTimeMs?: number;
   }) => {
     setQuizCompleted(true);
-    setQuizStarted(true);
 
     // Save quiz results and mark video as completed
-    if (video && participantId && username) {
+    if (video && participantId && username && condition) {
       const quizResults = {
         videoId: video.id,
         completedAt: Date.now(),
@@ -139,34 +230,79 @@ export function Player() {
         scoreAccuracy: score.accuracy,
       };
 
-      // Save to Supabase
+      // Save to Supabase (quiz tables handle their own metrics)
       await saveQuizResult(participantId, quizResults);
 
       // Mark video as completed and unlock next video
-      await markVideoCompleted(participantId, video.id, score.correct, score.total);
-      
-      // Handle gamification for gamified users
+      await markVideoCompleted(participantId, condition, video.id, score.correct, score.total);
+
+      // Handle gamification for gamified users (tracked in separate tables)
       if (isGamifiedVersion(condition)) {
         // Calculate and save stars
         const stars = calculateStars(score.correct, score.total);
         await saveVideoStars(participantId, video.id, stars);
-        
+
         // Calculate and award XP: +5 per correct, +10 for 8/10+, +20 for 10/10
         const xpReward = calculateXP(score.correct, score.total);
         await addXP(participantId, xpReward);
-        
+
         // Hearts are already deducted in real-time during quiz, no need to deduct again
-        
+
         // Update streak
         await updateStreak(participantId);
       }
-      
+
+      // Update video run: mark quiz as completed
+      // Note: quiz metrics (score, response times, etc.) are tracked in quiz tables
+      await updateVideoRun(participantId, video.id, {
+        quizCompleted: true,
+      });
+      console.log('[Player] Marked quiz as completed in video run');
+
+      // Track quiz completion event
+      trackEvent(participantId, condition, 'quiz_completed', 1, {
+        videoId: video.id,
+        correct: score.correct,
+        total: score.total,
+        accuracy: score.accuracy,
+      });
+
       // Dispatch custom event to notify Home page to refresh
       window.dispatchEvent(new Event('videoCompleted'));
     }
   };
 
   const handleReturnHome = () => {
+    // Track return home and capture final video completion percentage
+    if (participantId && condition && video) {
+      // Track event
+      trackEvent(participantId, condition, 'return_home_clicked', 1, {
+        videoId: video.id,
+        quizCompleted,
+      });
+
+      // Estimate video completion % based on time spent vs video duration
+      // (YouTube embeds don't expose actual playback position)
+      const timeSpentMs = Date.now() - pageStartTimeRef.current;
+      const timeSpentSec = timeSpentMs / 1000;
+      const estimatedCompletion = Math.min(100, (timeSpentSec / video.duration) * 100);
+
+      // Update video run with final metrics and END the session
+      // ended_at and time_to_click_return_home_ms will be calculated in the database
+      updateVideoRun(participantId, video.id, {
+        videoCompletionPct: estimatedCompletion, // Estimated for YouTube videos
+        numPauses: videoPauseCountRef.current,
+        numResumes: videoResumeCountRef.current,
+        captionsOnCount: 0, // YouTube captions not trackable
+        captionsOffCount: 0, // YouTube captions not trackable
+        endSession: true, // This triggers ended_at and time calculation
+      });
+      console.log('[Player] Updated video run with final metrics on return home', {
+        estimatedCompletion: `${estimatedCompletion.toFixed(1)}%`,
+        timeSpent: `${timeSpentSec.toFixed(0)}s`,
+        videoDuration: `${video.duration}s`,
+      });
+    }
     navigate('/');
   };
 
@@ -431,7 +567,7 @@ export function Player() {
               isVisible={quizVisible}
               onVisibilityChange={handleQuizVisibilityChange}
               participantId={participantId || ''}
-              onHeartsUpdate={setCurrentHearts}
+              onHeartsUpdate={() => {}} // No-op since hearts are tracked in gamification tables
             />
           ) : (
             <QuizModal

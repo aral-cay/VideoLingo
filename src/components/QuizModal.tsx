@@ -18,7 +18,13 @@ export interface Quiz {
 interface QuizModalProps {
   quiz: Quiz;
   onClose: () => void;
-  onComplete: (score: { correct: number; total: number; accuracy: number }) => void;
+  onComplete: (score: {
+    correct: number;
+    total: number;
+    accuracy: number;
+    totalResponseTimeMs?: number;
+    avgResponseTimeMs?: number;
+  }) => void;
   isVisible: boolean;
   onVisibilityChange: (visible: boolean) => void;
 }
@@ -70,7 +76,7 @@ export function QuizModal({
     if (selectedAnswer === null) return;
 
     const question = quiz.questions[currentQuestionIndex];
-    const responseTime = questionStopwatch.stop();
+    questionStopwatch.stop();
     const isCorrect = selectedAnswer === question.correctIndex;
 
     setLastAnswerCorrect(isCorrect);
@@ -81,7 +87,7 @@ export function QuizModal({
     if (selectedAnswer === null) return;
 
     const question = quiz.questions[currentQuestionIndex];
-    const responseTime = questionStopwatch.elapsed;
+    const responseTime = questionStopwatch.getElapsed();
     const isCorrect = selectedAnswer === question.correctIndex;
 
     const answerData = {
@@ -115,8 +121,12 @@ export function QuizModal({
     const total = quiz.questions.length;
     const accuracy = total > 0 ? correct / total : 0;
 
+    // Calculate timing metrics
+    const totalResponseTimeMs = answersToUse.reduce((sum, a) => sum + a.responseTime, 0);
+    const avgResponseTimeMs = total > 0 ? totalResponseTimeMs / total : 0;
+
     setQuizCompleted(true);
-    onComplete({ correct, total, accuracy });
+    onComplete({ correct, total, accuracy, totalResponseTimeMs, avgResponseTimeMs });
   };
 
   const handleHide = () => {

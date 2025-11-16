@@ -134,9 +134,6 @@ function endSessionSync(reason: string = 'page_unload'): void {
       ended_reason: reason,
     });
 
-    // Create blob with proper headers for Supabase
-    const blob = new Blob([body], { type: 'application/json' });
-
     // sendBeacon sends POST, but we need PATCH for Supabase updates
     // Use fetch with keepalive as fallback
     try {
@@ -177,109 +174,125 @@ export function getCurrentSessionId(): string | null {
 // ============= VIDEO RUN TRACKING =============
 
 interface VideoRunMetrics {
-  timeOnPageMs?: number;
-  timeToClickPlayMs?: number;
-  timeToClickStartQuizMs?: number;
-  timeToClickGenerateGameMs?: number;
-  timeToClickReturnHomeMs?: number;
-  videoCompletionPct?: number;
-  numVideoPauses?: number;
-  numVideoResumes?: number;
-  numPopupShow?: number;
-  numPopupHide?: number;
+  // Timing metrics (condition-specific, one will be NULL)
+  timeToStartQuizMs?: number; // Control condition only
+  timeToClickGenerateGameMs?: number; // Experimental condition only
+  
+  // Video interaction metrics (cumulative)
+  videoCompletionPct?: number; // Captured when clicking return home
+  numPauses?: number;
+  numResumes?: number;
   captionsOnCount?: number;
   captionsOffCount?: number;
+  
+  // Quiz completion status
   quizCompleted?: boolean;
-  questionsAnswered?: number;
-  questionsCorrect?: number;
-  questionsIncorrect?: number;
-  avgQuestionResponseTimeMs?: number;
-  totalQuestionResponseTimeMs?: number;
-  xpGained?: number;
-  videoStars?: number;
-  heartsRemaining?: number;
-  scoreAccuracy?: number;
+  
+  // End tracking - only set when clicking return home
+  endSession?: boolean; // Flag to trigger ended_at and time calculation
 }
 
 /**
- * Create a new video run when user starts watching a video
+ * Initialize or get existing video run for a participant + video combination
+ * Uses UPSERT pattern - creates new entry if doesn't exist, otherwise returns existing
+ * Note: started_at is only set on first creation, never updated
  */
-export async function createVideoRun(
+export async function initializeVideoRun(
   participantId: string,
   condition: Condition,
   videoId: string,
   dayNumber: number = 1
-): Promise<string | null> {
+): Promise<boolean> {
   try {
-    const { data, error } = await supabase
+    // Use upsert with ON CONFLICT to ensure we have a video run entry
+    // If entry exists, this does nothing (no update)
+    // If entry doesn't exist, it creates one with started_at
+    const { error } = await supabase
       .from('video_runs')
-      .insert({
+      .upsert({
         participant_id: participantId,
-        session_id: currentSessionId,
         video_id: videoId,
         condition,
         day_number: dayNumber,
         started_at: new Date().toISOString(),
-      })
-      .select('id')
-      .single();
+        session_id: null, // Always null per new requirements
+        time_to_click_play_ms: null, // Always null per new requirements
+      }, {
+        onConflict: 'participant_id,video_id',
+        ignoreDuplicates: true, // Don't update if already exists
+      });
 
     if (error) {
-      console.error('Error creating video run:', error);
-      return null;
+      console.error('Error initializing video run:', error);
+      return false;
     }
 
-    console.log(`[Tracking] Video run created: ${data.id} for video ${videoId}`);
-    return data.id;
+    console.log(`[Tracking] Video run initialized for participant ${participantId}, video ${videoId}`);
+    return true;
   } catch (error) {
-    console.error('Failed to create video run:', error);
-    return null;
+    console.error('Failed to initialize video run:', error);
+    return false;
   }
 }
 
 /**
- * Update an existing video run with metrics
+ * Update video run metrics for a participant + video combination
+ * Uses the composite key (participant_id, video_id) instead of video_run_id
  */
 export async function updateVideoRun(
-  videoRunId: string,
+  participantId: string,
+  videoId: string,
   metrics: VideoRunMetrics
 ): Promise<void> {
   try {
     // Convert camelCase to snake_case for database
     const dbMetrics: any = {};
     
-    if (metrics.timeOnPageMs !== undefined) dbMetrics.time_on_page_ms = metrics.timeOnPageMs;
-    if (metrics.timeToClickPlayMs !== undefined) dbMetrics.time_to_click_play_ms = metrics.timeToClickPlayMs;
-    if (metrics.timeToClickStartQuizMs !== undefined) dbMetrics.time_to_click_start_quiz_ms = metrics.timeToClickStartQuizMs;
+    // Timing metrics (condition-specific)
+    if (metrics.timeToStartQuizMs !== undefined) dbMetrics.time_to_start_quiz_ms = metrics.timeToStartQuizMs;
     if (metrics.timeToClickGenerateGameMs !== undefined) dbMetrics.time_to_click_generate_game_ms = metrics.timeToClickGenerateGameMs;
-    if (metrics.timeToClickReturnHomeMs !== undefined) dbMetrics.time_to_click_return_home_ms = metrics.timeToClickReturnHomeMs;
+    
+    // Video interaction metrics
     if (metrics.videoCompletionPct !== undefined) dbMetrics.video_completion_pct = metrics.videoCompletionPct;
-    if (metrics.numVideoPauses !== undefined) dbMetrics.num_video_pauses = metrics.numVideoPauses;
-    if (metrics.numVideoResumes !== undefined) dbMetrics.num_video_resumes = metrics.numVideoResumes;
-    if (metrics.numPopupShow !== undefined) dbMetrics.num_popup_show = metrics.numPopupShow;
-    if (metrics.numPopupHide !== undefined) dbMetrics.num_popup_hide = metrics.numPopupHide;
+    if (metrics.numPauses !== undefined) dbMetrics.num_pauses = metrics.numPauses;
+    if (metrics.numResumes !== undefined) dbMetrics.num_resumes = metrics.numResumes;
     if (metrics.captionsOnCount !== undefined) dbMetrics.captions_on_count = metrics.captionsOnCount;
     if (metrics.captionsOffCount !== undefined) dbMetrics.captions_off_count = metrics.captionsOffCount;
+    
+    // Quiz completion
     if (metrics.quizCompleted !== undefined) dbMetrics.quiz_completed = metrics.quizCompleted;
-    if (metrics.questionsAnswered !== undefined) dbMetrics.questions_answered = metrics.questionsAnswered;
-    if (metrics.questionsCorrect !== undefined) dbMetrics.questions_correct = metrics.questionsCorrect;
-    if (metrics.questionsIncorrect !== undefined) dbMetrics.questions_incorrect = metrics.questionsIncorrect;
-    if (metrics.avgQuestionResponseTimeMs !== undefined) dbMetrics.avg_question_response_time_ms = metrics.avgQuestionResponseTimeMs;
-    if (metrics.totalQuestionResponseTimeMs !== undefined) dbMetrics.total_question_response_time_ms = metrics.totalQuestionResponseTimeMs;
-    if (metrics.xpGained !== undefined) dbMetrics.xp_gained = metrics.xpGained;
-    if (metrics.videoStars !== undefined) dbMetrics.video_stars = metrics.videoStars;
-    if (metrics.heartsRemaining !== undefined) dbMetrics.hearts_remaining = metrics.heartsRemaining;
-    if (metrics.scoreAccuracy !== undefined) dbMetrics.score_accuracy = metrics.scoreAccuracy;
 
-    dbMetrics.ended_at = new Date().toISOString();
+    // ONLY set ended_at when explicitly ending the session (return home click)
+    if (metrics.endSession) {
+      dbMetrics.ended_at = new Date().toISOString();
+      
+      // Calculate time_to_click_return_home_ms as the delta between ended_at and started_at
+      // We'll use a subquery to calculate this in the database
+      const { data, error: selectError } = await supabase
+        .from('video_runs')
+        .select('started_at')
+        .eq('participant_id', participantId)
+        .eq('video_id', videoId)
+        .single();
+      
+      if (!selectError && data) {
+        const startedAt = new Date(data.started_at).getTime();
+        const endedAt = new Date(dbMetrics.ended_at).getTime();
+        dbMetrics.time_to_click_return_home_ms = endedAt - startedAt;
+      }
+    }
 
     const { error } = await supabase
       .from('video_runs')
       .update(dbMetrics)
-      .eq('id', videoRunId);
+      .eq('participant_id', participantId)
+      .eq('video_id', videoId);
 
     if (error) {
       console.error('Error updating video run:', error);
+      console.error('Error details:', error);
+    } else {
+      console.log(`[Tracking] Video run updated for participant ${participantId}, video ${videoId}`);
     }
   } catch (error) {
     console.error('Failed to update video run:', error);
@@ -290,14 +303,14 @@ export async function updateVideoRun(
 
 /**
  * Track a discrete event (button click, video pause, etc.)
+ * Events are self-contained with participant_id, condition, and metadata
  */
 export async function trackEvent(
   participantId: string,
   condition: Condition,
   eventType: string,
   dayNumber: number = 1,
-  meta?: Record<string, any>,
-  videoRunId?: string | null
+  meta?: Record<string, any>
 ): Promise<void> {
   try {
     await supabase
@@ -305,7 +318,6 @@ export async function trackEvent(
       .insert({
         participant_id: participantId,
         session_id: currentSessionId,
-        video_run_id: videoRunId || null,
         condition,
         day_number: dayNumber,
         event_type: eventType,

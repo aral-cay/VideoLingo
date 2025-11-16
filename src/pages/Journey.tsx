@@ -47,6 +47,8 @@ export function Journey() {
     }
 
     const loadData = async () => {
+      if (!condition) return; // Ensure condition is not null
+
       // Load gamification data
       try {
         const { data: gamData } = await supabase
@@ -71,8 +73,8 @@ export function Journey() {
 
       for (let i = 0; i < videos.length; i++) {
         const video = videos[i];
-        const unlocked = await isVideoUnlocked(participantId, video.id, i, allVideoIds);
-        const score = await getVideoScore(participantId, video.id);
+        const unlocked = await isVideoUnlocked(participantId, condition, video.id, i, allVideoIds);
+        const score = await getVideoScore(participantId, condition, video.id);
         const totalQuestions = video.quiz?.questions?.length || 10;
         
         // Get stars for this video
@@ -82,6 +84,7 @@ export function Journey() {
             .from('user_progress')
             .select('video_stars')
             .eq('participant_id', participantId)
+            .eq('condition', condition)
             .single();
           
           if (progressData?.video_stars && typeof progressData.video_stars === 'object') {

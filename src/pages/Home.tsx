@@ -25,7 +25,7 @@ export function Home() {
 
   // Load video states from Supabase
   useEffect(() => {
-    if (!participantId) return;
+    if (!participantId || !condition) return;
 
     const loadVideoStates = async () => {
       setIsLoading(true);
@@ -34,8 +34,8 @@ export function Home() {
 
       for (let i = 0; i < videos.length; i++) {
         const video = videos[i];
-        const unlocked = await isVideoUnlocked(participantId, video.id, i, allVideoIds);
-        const score = await getVideoScore(participantId, video.id);
+        const unlocked = await isVideoUnlocked(participantId, condition, video.id, i, allVideoIds);
+        const score = await getVideoScore(participantId, condition, video.id);
         states.set(video.id, { unlocked, score });
       }
 
@@ -44,7 +44,7 @@ export function Home() {
     };
 
     loadVideoStates();
-  }, [participantId, videos, refreshKey]);
+  }, [participantId, condition, videos, refreshKey]);
 
   // Refresh when location changes or component mounts
   useEffect(() => {
@@ -110,7 +110,7 @@ export function Home() {
           </div>
         ) : (
           <div className="videos-grid">
-            {videos.map((video, index) => {
+            {videos.map((video) => {
               const state = videoStates.get(video.id) || { unlocked: false, score: null };
               const totalQuestions = video.quiz?.questions?.length || 0;
               

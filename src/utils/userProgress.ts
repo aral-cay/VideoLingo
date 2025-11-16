@@ -1,9 +1,11 @@
 /**
  * User Progress Management with Supabase
- * Tracks completed videos and quiz scores per participant
+ * Tracks completed videos and quiz scores per participant per condition
+ * This allows separate progress tracking when participants switch conditions
  */
 
 import { supabase } from '../lib/supabase';
+import type { Condition } from './studyCondition';
 
 export interface UserProgress {
   completedVideos: string[]; // Array of video IDs that have been completed
@@ -11,14 +13,15 @@ export interface UserProgress {
 }
 
 /**
- * Get participant progress from Supabase
+ * Get participant progress from Supabase for their current condition
  */
-export async function getUserProgress(participantId: string): Promise<UserProgress> {
+export async function getUserProgress(participantId: string, condition: Condition): Promise<UserProgress> {
   try {
     const { data, error } = await supabase
       .from('user_progress')
       .select('completed_videos, video_scores')
       .eq('participant_id', participantId)
+      .eq('condition', condition)
       .single();
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
@@ -33,7 +36,7 @@ export async function getUserProgress(participantId: string): Promise<UserProgre
       };
     }
 
-    // No progress found, return empty
+    // No progress found for this condition, return empty
     return { completedVideos: [], videoScores: {} };
   } catch (error) {
     console.error('Failed to get user progress:', error);
@@ -42,19 +45,21 @@ export async function getUserProgress(participantId: string): Promise<UserProgre
 }
 
 /**
- * Save participant progress to Supabase
+ * Save participant progress to Supabase for their current condition
+ * Creates a new row if participant is in a new condition, updates existing row otherwise
  */
-export async function saveUserProgress(participantId: string, progress: UserProgress): Promise<void> {
+export async function saveUserProgress(participantId: string, condition: Condition, progress: UserProgress): Promise<void> {
   try {
     const { error } = await supabase
       .from('user_progress')
       .upsert({
         participant_id: participantId,
+        condition: condition,
         completed_videos: progress.completedVideos,
         video_scores: progress.videoScores,
         updated_at: new Date().toISOString(),
       }, {
-        onConflict: 'participant_id',
+        onConflict: 'participant_id,condition',
       });
 
     if (error) {
@@ -68,12 +73,13 @@ export async function saveUserProgress(participantId: string, progress: UserProg
 }
 
 /**
- * Check if a video is unlocked for a participant
+ * Check if a video is unlocked for a participant in their current condition
  * First video (index 0) is always unlocked
  * Subsequent videos are unlocked when the previous video is completed
  */
 export async function isVideoUnlocked(
   participantId: string,
+  condition: Condition,
   videoId: string,
   videoIndex: number,
   allVideoIds: string[]
@@ -83,7 +89,7 @@ export async function isVideoUnlocked(
     return true;
   }
 
-  const progress = await getUserProgress(participantId);
+  const progress = await getUserProgress(participantId, condition);
 
   // STRICT CHECK: Video is unlocked ONLY if the previous video is completed
   const completedVideos = Array.isArray(progress.completedVideos) ? progress.completedVideos : [];
@@ -99,7 +105,7 @@ export async function isVideoUnlocked(
     const isUnlocked = completedVideos.includes(previousVideoId);
 
     // Debug logging
-    console.log(`[Unlock] Video ${videoId} (idx ${videoIndex}): prev=${previousVideoId}, completed=[${completedVideos.join(',')}], unlocked=${isUnlocked}`);
+    console.log(`[Unlock] Condition=${condition}, Video ${videoId} (idx ${videoIndex}): prev=${previousVideoId}, completed=[${completedVideos.join(',')}], unlocked=${isUnlocked}`);
 
     return isUnlocked;
   }
@@ -109,15 +115,16 @@ export async function isVideoUnlocked(
 }
 
 /**
- * Mark a video as completed and unlock the next one
+ * Mark a video as completed and unlock the next one for the current condition
  */
 export async function markVideoCompleted(
   participantId: string,
+  condition: Condition,
   videoId: string,
   score: number,
-  totalQuestions: number
+  _totalQuestions: number // Prefix with _ to indicate intentionally unused
 ): Promise<void> {
-  const progress = await getUserProgress(participantId);
+  const progress = await getUserProgress(participantId, condition);
 
   // Add to completed videos if not already there
   if (!progress.completedVideos.includes(videoId)) {
@@ -130,21 +137,21 @@ export async function markVideoCompleted(
     progress.videoScores[videoId] = score;
   }
 
-  await saveUserProgress(participantId, progress);
+  await saveUserProgress(participantId, condition, progress);
 }
 
 /**
- * Get the highest score for a video
+ * Get the highest score for a video in the current condition
  */
-export async function getVideoScore(participantId: string, videoId: string): Promise<number | null> {
-  const progress = await getUserProgress(participantId);
+export async function getVideoScore(participantId: string, condition: Condition, videoId: string): Promise<number | null> {
+  const progress = await getUserProgress(participantId, condition);
   return progress.videoScores[videoId] || null;
 }
 
 /**
- * Check if a video is completed
+ * Check if a video is completed in the current condition
  */
-export async function isVideoCompleted(participantId: string, videoId: string): Promise<boolean> {
-  const progress = await getUserProgress(participantId);
+export async function isVideoCompleted(participantId: string, condition: Condition, videoId: string): Promise<boolean> {
+  const progress = await getUserProgress(participantId, condition);
   return progress.completedVideos.includes(videoId);
 }

@@ -2,13 +2,19 @@ import { useState, useEffect, useRef } from 'react';
 import { useStopwatch } from '../hooks/useStopwatch';
 import { useAuth } from '../contexts/AuthContext';
 import { getCharacterImage, type CharacterEmotion } from '../utils/characterAvatar';
-import type { Quiz, QuizQuestion } from './QuizModal';
+import type { Quiz } from './QuizModal';
 import './GamifiedQuiz.css';
 
 interface GamifiedQuizProps {
   quiz: Quiz;
   onClose: () => void;
-  onComplete: (score: { correct: number; total: number; accuracy: number }) => void;
+  onComplete: (score: {
+    correct: number;
+    total: number;
+    accuracy: number;
+    totalResponseTimeMs?: number;
+    avgResponseTimeMs?: number;
+  }) => void;
   isVisible: boolean;
   onVisibilityChange: (visible: boolean) => void;
   participantId?: string;
@@ -134,7 +140,7 @@ export function GamifiedQuiz({
       .map(w => w.trim())
       .filter(w => w.length > 0);
     
-    const responseTime = questionStopwatch.stop();
+    questionStopwatch.stop();
     const isCorrect = selectedWords.length === correctWords.length &&
       selectedWords.every((word, idx) => word === correctWords[idx]);
 
@@ -209,8 +215,12 @@ export function GamifiedQuiz({
     const total = quiz.questions.length;
     const accuracy = total > 0 ? correct / total : 0;
 
+    // Calculate timing metrics
+    const totalResponseTimeMs = answersToUse.reduce((sum, a) => sum + a.responseTime, 0);
+    const avgResponseTimeMs = total > 0 ? totalResponseTimeMs / total : 0;
+
     setQuizCompleted(true);
-    onComplete({ correct, total, accuracy });
+    onComplete({ correct, total, accuracy, totalResponseTimeMs, avgResponseTimeMs });
   };
 
   const handleHide = () => {
