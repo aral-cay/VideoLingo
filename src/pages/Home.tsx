@@ -75,7 +75,7 @@ export function Home() {
       <header className="app-header">
         <h1 className="app-title">VideoLingo</h1>
         <div className="header-user-section">
-          <span className="header-username">Welcome, {username}!</span>
+          <span className="header-username">Welcome, Sir {username}!</span>
           <button onClick={logout} className="logout-button">
             Logout
           </button>
