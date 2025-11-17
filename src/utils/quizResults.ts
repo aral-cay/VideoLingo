@@ -36,11 +36,9 @@ export async function saveQuizResult(
       });
 
     if (error) {
-      console.error('Error saving quiz result:', error);
       throw error;
     }
   } catch (error) {
-    console.error('Failed to save quiz result:', error);
     throw error;
   }
 }

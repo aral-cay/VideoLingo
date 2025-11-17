@@ -8,6 +8,7 @@ interface AuthContextType {
   cohort: Cohort | null;
   condition: Condition | null;
   dayNumber: number;
+  videoBatch: string;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
@@ -34,6 +35,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem('currentDayNumber');
     return stored ? parseInt(stored, 10) : 1;
   });
+  const [videoBatch, setVideoBatch] = useState<string>(() => {
+    return localStorage.getItem('currentVideoBatch') || 'videos_batch1.json';
+  });
 
   useEffect(() => {
     if (participantId && username && cohort && condition) {
@@ -42,16 +46,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('currentCohort', cohort);
       localStorage.setItem('currentCondition', condition);
       localStorage.setItem('currentDayNumber', dayNumber.toString());
+      localStorage.setItem('currentVideoBatch', videoBatch);
     } else {
       localStorage.removeItem('currentParticipantId');
       localStorage.removeItem('currentUsername');
       localStorage.removeItem('currentCohort');
       localStorage.removeItem('currentCondition');
       localStorage.removeItem('currentDayNumber');
+      localStorage.removeItem('currentVideoBatch');
     }
-  }, [participantId, username, cohort, condition, dayNumber]);
+  }, [participantId, username, cohort, condition, dayNumber, videoBatch]);
 
   // Re-initialize tracking when session is restored from localStorage (page refresh/new tab)
+  // Also refresh video_batch from database to catch any manual updates
   useEffect(() => {
     const initializeTrackingOnLoad = async () => {
       // Read directly from localStorage to avoid dependency issues
@@ -60,17 +67,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const storedDayNumber = localStorage.getItem('currentDayNumber');
 
       if (storedParticipantId && storedCondition) {
-        console.log('[AuthContext] Re-initializing tracking for existing session:', {
-          participantId: storedParticipantId,
-          condition: storedCondition,
-          dayNumber: storedDayNumber
-        });
         const { initializeTracking } = await import('../utils/tracking');
         await initializeTracking(
           storedParticipantId,
           storedCondition,
           storedDayNumber ? parseInt(storedDayNumber, 10) : 1
         );
+
+        // Refresh video_batch from database to catch any manual updates
+        try {
+          const { data, error } = await supabase
+            .from('participants')
+            .select('video_batch')
+            .eq('id', storedParticipantId)
+            .single();
+
+          if (!error && data && data.video_batch) {
+            const currentBatch = localStorage.getItem('currentVideoBatch');
+            if (currentBatch !== data.video_batch) {
+              setVideoBatch(data.video_batch);
+              localStorage.setItem('currentVideoBatch', data.video_batch);
+            }
+          }
+        } catch (error) {
+          // Silently fail - video batch refresh is best effort
+        }
       }
     };
 
@@ -82,22 +103,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Find participant in Supabase participants table
       const { data: participantData, error: participantError } = await supabase
         .from('participants')
-        .select('id, username, password_hash, cohort, condition, day_number')
+        .select('id, username, password_hash, cohort, condition, day_number, video_batch')
         .eq('username', usernameInput)
         .maybeSingle(); // Use maybeSingle() instead of single() to handle no results gracefully
 
       if (participantError) {
-        console.error('Error fetching participant:', participantError);
         // If Supabase is not configured, fall back to local check
         if (participantError.message?.includes('JWT') || participantError.message?.includes('API')) {
-          console.warn('Supabase not configured, falling back to local auth');
           return false;
         }
         return false;
       }
 
       if (!participantData) {
-        console.error('Participant not found:', usernameInput);
         return false;
       }
 
@@ -116,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setCohort(participantData.cohort as Cohort);
       setCondition(participantData.condition as Condition);
       setDayNumber(participantData.day_number || 1);
+      setVideoBatch(participantData.video_batch || 'videos_batch1.json');
 
       // Initialize participant progress if it doesn't exist for this condition
       await initializeParticipantProgress(participantData.id, participantData.condition as Condition);
@@ -137,7 +156,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return true;
     } catch (error) {
-      console.error('Login error:', error);
       return false;
     }
   };
@@ -153,7 +171,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error && error.code === 'PGRST116') {
         // No progress exists for this condition, create it
-        console.log(`[Auth] Creating new progress row for participant ${participantId} with condition ${condition}`);
         await supabase
           .from('user_progress')
           .insert({
@@ -164,7 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
       }
     } catch (error) {
-      console.error('Error initializing participant progress:', error);
+      // Silently fail - progress initialization is best effort
     }
   };
 
@@ -178,6 +195,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCohort(null);
     setCondition(null);
     setDayNumber(1);
+    setVideoBatch('videos_batch1.json');
   };
 
   return (
@@ -188,6 +206,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         cohort,
         condition,
         dayNumber,
+        videoBatch,
         login,
         logout,
         isAuthenticated: !!participantId,

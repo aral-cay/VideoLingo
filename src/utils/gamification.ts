@@ -24,7 +24,6 @@ export async function getGamificationData(participantId: string): Promise<Gamifi
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching gamification data:', error);
       return null;
     }
 
@@ -39,7 +38,6 @@ export async function getGamificationData(participantId: string): Promise<Gamifi
 
     return null;
   } catch (error) {
-    console.error('Failed to get gamification data:', error);
     return null;
   }
 }
@@ -70,11 +68,9 @@ export async function updateGamificationData(
       });
 
     if (error) {
-      console.error('Error updating gamification data:', error);
       throw error;
     }
   } catch (error) {
-    console.error('Failed to update gamification data:', error);
     throw error;
   }
 }
@@ -140,17 +136,17 @@ export function calculateXP(correct: number, total: number): number {
 /**
  * Save video stars
  */
-export async function saveVideoStars(participantId: string, videoId: string, stars: number): Promise<void> {
+export async function saveVideoStars(participantId: string, condition: string, videoId: string, stars: number): Promise<void> {
   try {
-    // Get current progress
+    // Get current progress for this condition
     const { data: progressData, error: progressError } = await supabase
       .from('user_progress')
       .select('video_stars')
       .eq('participant_id', participantId)
+      .eq('condition', condition)
       .single();
 
     if (progressError && progressError.code !== 'PGRST116') {
-      console.error('Error fetching progress:', progressError);
       return;
     }
 
@@ -161,20 +157,17 @@ export async function saveVideoStars(participantId: string, videoId: string, sta
     if (stars > currentStarCount) {
       currentStars[videoId] = stars;
 
-      const { error } = await supabase
+      await supabase
         .from('user_progress')
         .update({
           video_stars: currentStars,
           updated_at: new Date().toISOString(),
         })
-        .eq('participant_id', participantId);
-
-      if (error) {
-        console.error('Error saving video stars:', error);
-      }
+        .eq('participant_id', participantId)
+        .eq('condition', condition);
     }
   } catch (error) {
-    console.error('Failed to save video stars:', error);
+    // Silently fail - stars saving is best effort
   }
 }
 

@@ -4,12 +4,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { VideoTile } from '../components/VideoTile';
 import { GamifiedHome } from './GamifiedHome';
 import { isGamifiedVersion } from '../utils/userVersion';
-import videosData from '../data/videos.json';
 import type { Video } from '../types';
 import { isVideoUnlocked, getVideoScore } from '../utils/userProgress';
+import { loadVideoBatch } from '../utils/videoLoader';
 
 export function Home() {
-  const { participantId, username, condition, logout } = useAuth();
+  const { participantId, username, condition, videoBatch, logout } = useAuth();
   
   // Show gamified version based on condition
   if (isGamifiedVersion(condition)) {
@@ -17,11 +17,16 @@ export function Home() {
   }
   
   // Show control version for Kabir and Luca
-  const [videos] = useState<Video[]>(videosData as Video[]);
+  const [videos, setVideos] = useState<Video[]>(loadVideoBatch(videoBatch));
   const location = useLocation();
   const [refreshKey, setRefreshKey] = useState(0);
   const [videoStates, setVideoStates] = useState<Map<string, { unlocked: boolean; score: number | null }>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
+
+  // Reload videos when videoBatch changes
+  useEffect(() => {
+    setVideos(loadVideoBatch(videoBatch));
+  }, [videoBatch]);
 
   // Load video states from Supabase
   useEffect(() => {

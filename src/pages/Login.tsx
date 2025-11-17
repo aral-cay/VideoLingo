@@ -28,7 +28,6 @@ export function Login() {
     } catch (err) {
       setError('Login failed. Please try again.');
       setIsLoading(false);
-      console.error('Login error:', err);
     }
   };
 

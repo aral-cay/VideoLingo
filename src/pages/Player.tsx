@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { QuizModal } from '../components/QuizModal';
 import { GamifiedQuiz } from '../components/GamifiedQuiz';
-import videosData from '../data/videos.json';
 import type { Video } from '../types';
 import lexosaLogo from '../assets/lexosa-logo.png';
 import { isVideoUnlocked, markVideoCompleted } from '../utils/userProgress';
@@ -12,14 +11,20 @@ import { saveQuizResult } from '../utils/quizResults';
 import { isGamifiedVersion } from '../utils/userVersion';
 import { addXP, saveVideoStars, calculateStars, calculateXP, updateStreak } from '../utils/gamification';
 import { initializeVideoRun, updateVideoRun, trackEvent } from '../utils/tracking';
+import { loadVideoBatch } from '../utils/videoLoader';
 
 export function Player() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { participantId, username, condition, logout } = useAuth();
-  const [videos] = useState<Video[]>(videosData as Video[]);
+  const { participantId, username, condition, videoBatch, logout } = useAuth();
+  const [videos, setVideos] = useState<Video[]>(loadVideoBatch(videoBatch));
   const video = videos.find((v) => v.id === id);
   const videoIndex = videos.findIndex((v) => v.id === id);
+
+  // Reload videos when videoBatch changes
+  useEffect(() => {
+    setVideos(loadVideoBatch(videoBatch));
+  }, [videoBatch]);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [captionsEnabled, setCaptionsEnabled] = useState(false);
   const [quizVisible, setQuizVisible] = useState(false);
@@ -59,7 +64,6 @@ export function Player() {
       // Initialize video run for tracking (creates if doesn't exist)
       if (condition) {
         await initializeVideoRun(participantId, condition, video.id, 1);
-        console.log(`[Player] Initialized video run for participant ${participantId}, video ${video.id}`);
       }
 
       // Load video state from Supabase
@@ -99,7 +103,6 @@ export function Player() {
             captionsOffCount: captionsOffCountRef.current,
             quizCompleted: false,
           });
-          console.log('[Player] Updated video run on cleanup (incomplete)');
         }
       };
       saveState();
@@ -240,7 +243,7 @@ export function Player() {
       if (isGamifiedVersion(condition)) {
         // Calculate and save stars
         const stars = calculateStars(score.correct, score.total);
-        await saveVideoStars(participantId, video.id, stars);
+        await saveVideoStars(participantId, condition, video.id, stars);
 
         // Calculate and award XP: +5 per correct, +10 for 8/10+, +20 for 10/10
         const xpReward = calculateXP(score.correct, score.total);
@@ -257,7 +260,6 @@ export function Player() {
       await updateVideoRun(participantId, video.id, {
         quizCompleted: true,
       });
-      console.log('[Player] Marked quiz as completed in video run');
 
       // Track quiz completion event
       trackEvent(participantId, condition, 'quiz_completed', 1, {
@@ -296,11 +298,6 @@ export function Player() {
         captionsOnCount: 0, // YouTube captions not trackable
         captionsOffCount: 0, // YouTube captions not trackable
         endSession: true, // This triggers ended_at and time calculation
-      });
-      console.log('[Player] Updated video run with final metrics on return home', {
-        estimatedCompletion: `${estimatedCompletion.toFixed(1)}%`,
-        timeSpent: `${timeSpentSec.toFixed(0)}s`,
-        videoDuration: `${video.duration}s`,
       });
     }
     navigate('/');

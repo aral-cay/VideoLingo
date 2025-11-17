@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { isGamifiedVersion } from '../utils/userVersion';
-import videosData from '../data/videos.json';
 import type { Video } from '../types';
 import { isVideoUnlocked, getVideoScore } from '../utils/userProgress';
 import { supabase } from '../lib/supabase';
 import { getCharacterImage } from '../utils/characterAvatar';
+import { loadVideoBatch } from '../utils/videoLoader';
 import './Journey.css';
 
 interface GamificationData {
@@ -22,9 +22,9 @@ interface OtherUserPosition {
 }
 
 export function Journey() {
-  const { participantId, username, condition } = useAuth();
+  const { participantId, username, condition, videoBatch } = useAuth();
   const navigate = useNavigate();
-  const [videos] = useState<Video[]>(videosData as Video[]);
+  const [videos, setVideos] = useState<Video[]>(loadVideoBatch(videoBatch));
   const [videoStates, setVideoStates] = useState<Map<string, { unlocked: boolean; score: number | null; stars: number; totalQuestions: number }>>(new Map());
   const [gamification, setGamification] = useState<GamificationData>({ xp: 0, hearts: 20 });
   const [refreshKey, setRefreshKey] = useState(0);
@@ -32,6 +32,11 @@ export function Journey() {
   const [currentUserPosition, setCurrentUserPosition] = useState<number>(0);
   // Colors for different users
   const userColors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94'];
+
+  // Reload videos when videoBatch changes
+  useEffect(() => {
+    setVideos(loadVideoBatch(videoBatch));
+  }, [videoBatch]);
 
   useEffect(() => {
     if (!participantId || !username) {
@@ -63,7 +68,7 @@ export function Journey() {
           });
         }
       } catch (error) {
-        console.error('Error loading gamification:', error);
+        // Silently fail - will use default values
       }
 
       // Load video states
@@ -90,7 +95,7 @@ export function Journey() {
             stars = (progressData.video_stars as Record<string, number>)[video.id] || 0;
           }
         } catch (error) {
-          console.error('Error loading stars:', error);
+          // Silently fail - stars will default to 0
         }
 
         states.set(video.id, { unlocked, score, stars, totalQuestions });
@@ -104,6 +109,7 @@ export function Journey() {
           .from('user_progress')
           .select('completed_videos')
           .eq('participant_id', participantId)
+          .eq('condition', condition)
           .single();
 
         const completedVideos = (progressData?.completed_videos as string[]) || [];
@@ -122,7 +128,7 @@ export function Journey() {
         }
         setCurrentUserPosition(position);
       } catch (error) {
-        console.error('Error loading current user position:', error);
+        // Silently fail - position will default to 0
       }
     };
 
@@ -137,14 +143,13 @@ export function Journey() {
           return;
         }
 
-        // Fetch other participants
+        // Fetch other participants (including their current condition)
         const { data: participantsData, error: participantsError } = await supabase
           .from('participants')
-          .select('id, username')
+          .select('id, username, condition')
           .in('username', otherUsernames);
 
         if (participantsError || !participantsData) {
-          console.error('Error fetching other participants:', participantsError);
           return;
         }
 
@@ -153,11 +158,12 @@ export function Journey() {
         for (let i = 0; i < participantsData.length; i++) {
           const participant = participantsData[i];
           
-          // Get participant's progress
+          // Get participant's progress for THEIR current condition
           const { data: progressData } = await supabase
             .from('user_progress')
             .select('completed_videos')
             .eq('participant_id', participant.id)
+            .eq('condition', participant.condition)
             .single();
 
           const completedVideos = (progressData?.completed_videos as string[]) || [];
@@ -190,7 +196,7 @@ export function Journey() {
 
         setOtherUsers(otherUserPositions);
       } catch (error) {
-        console.error('Error loading other users positions:', error);
+        // Silently fail - other users are optional
       }
     };
 
@@ -217,7 +223,7 @@ export function Journey() {
             });
           }
         } catch (error) {
-          console.error('Error refreshing gamification data:', error);
+          // Silently fail - refresh is best effort
         }
       }
     };
@@ -276,7 +282,7 @@ export function Journey() {
           <div className="themes-container">
             {videos.map((video, index) => {
               const state = videoStates.get(video.id) || { unlocked: false, score: null, stars: 0, totalQuestions: 10 };
-              const isFirstInTheme = index === 0 || (index > 0 && videos[index - 1].theme !== video.theme);
+              const isFirstInTheme = true; // Always show theme label
               const totalQuestions = state.totalQuestions || video.quiz?.questions?.length || 10;
 
               // Check if any other users are at this position
@@ -298,7 +304,7 @@ export function Journey() {
                     {/* Theme Label */}
                     {isFirstInTheme && (
                       <div className={`theme-label ${state.unlocked ? '' : 'locked-theme'}`}>
-                        Theme: {state.unlocked ? video.theme : '???'}
+                        Theme: {video.theme}
                       </div>
                     )}
 

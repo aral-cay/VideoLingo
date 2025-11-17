@@ -25,7 +25,6 @@ export async function getUserProgress(participantId: string, condition: Conditio
       .single();
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-      console.error('Error fetching user progress:', error);
       return { completedVideos: [], videoScores: {} };
     }
 
@@ -39,7 +38,6 @@ export async function getUserProgress(participantId: string, condition: Conditio
     // No progress found for this condition, return empty
     return { completedVideos: [], videoScores: {} };
   } catch (error) {
-    console.error('Failed to get user progress:', error);
     return { completedVideos: [], videoScores: {} };
   }
 }
@@ -63,11 +61,9 @@ export async function saveUserProgress(participantId: string, condition: Conditi
       });
 
     if (error) {
-      console.error('Error saving user progress:', error);
       throw error;
     }
   } catch (error) {
-    console.error('Failed to save user progress:', error);
     throw error;
   }
 }
@@ -80,7 +76,7 @@ export async function saveUserProgress(participantId: string, condition: Conditi
 export async function isVideoUnlocked(
   participantId: string,
   condition: Condition,
-  videoId: string,
+  _videoId: string,
   videoIndex: number,
   allVideoIds: string[]
 ): Promise<boolean> {
@@ -103,9 +99,6 @@ export async function isVideoUnlocked(
   if (videoIndex > 0 && videoIndex < allVideoIds.length) {
     const previousVideoId = allVideoIds[videoIndex - 1];
     const isUnlocked = completedVideos.includes(previousVideoId);
-
-    // Debug logging
-    console.log(`[Unlock] Condition=${condition}, Video ${videoId} (idx ${videoIndex}): prev=${previousVideoId}, completed=[${completedVideos.join(',')}], unlocked=${isUnlocked}`);
 
     return isUnlocked;
   }

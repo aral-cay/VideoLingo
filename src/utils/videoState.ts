@@ -24,7 +24,6 @@ export async function getVideoState(participantId: string, videoId: string): Pro
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching video state:', error);
       return null;
     }
 
@@ -38,7 +37,6 @@ export async function getVideoState(participantId: string, videoId: string): Pro
 
     return null;
   } catch (error) {
-    console.error('Failed to get video state:', error);
     return null;
   }
 }
@@ -66,11 +64,9 @@ export async function saveVideoState(
       });
 
     if (error) {
-      console.error('Error saving video state:', error);
       throw error;
     }
   } catch (error) {
-    console.error('Failed to save video state:', error);
     throw error;
   }
 }

@@ -80,7 +80,7 @@ export function GamifiedHome() {
           }
         }
       } catch (error) {
-        console.error('Error loading gamification data:', error);
+        // Silently fail - will use default values
       } finally {
         setIsLoading(false);
       }
@@ -103,7 +103,6 @@ export function GamifiedHome() {
           .in('username', gamifiedUsernames);
 
         if (participantsError) {
-          console.error('Error fetching participants:', participantsError);
           return;
         }
 
@@ -120,7 +119,6 @@ export function GamifiedHome() {
           .in('participant_id', participantIds);
 
         if (gamError) {
-          console.error('Error fetching gamification data:', gamError);
           return;
         }
 
@@ -146,7 +144,7 @@ export function GamifiedHome() {
 
         setLeaderboard(allLeaderboardEntries);
       } catch (error) {
-        console.error('Error loading leaderboard:', error);
+        // Silently fail - leaderboard is optional
       }
     };
 

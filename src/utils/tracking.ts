@@ -26,14 +26,12 @@ export async function startSession(participantId: string, condition: Condition, 
     // Prevent rapid duplicate session creation (React Strict Mode in development)
     const now = Date.now();
     if (now - lastSessionStartTime < 100) {
-      console.log(`[Tracking] Skipping duplicate session start (${now - lastSessionStartTime}ms since last)`);
       return currentSessionId;
     }
     lastSessionStartTime = now;
 
     // End any existing session first to prevent orphaned sessions
     if (currentSessionId) {
-      console.log(`[Tracking] Ending existing session ${currentSessionId} before starting new one`);
       await endSession('session_replaced');
     }
 
@@ -41,8 +39,6 @@ export async function startSession(participantId: string, condition: Condition, 
     currentParticipantId = participantId;
     currentCondition = condition;
     currentDayNumber = dayNumber;
-
-    console.log(`[Tracking] Attempting to start session for participant=${participantId}, condition=${condition}, day=${dayNumber}`);
 
     const { data, error } = await supabase
       .from('sessions')
@@ -56,18 +52,14 @@ export async function startSession(participantId: string, condition: Condition, 
       .single();
 
     if (error) {
-      console.error('[Tracking] Database error starting session:', error);
-      console.error('[Tracking] Error details:', JSON.stringify(error, null, 2));
       return null;
     }
 
     currentSessionId = data.id;
     sessionStartTime = Date.now();
 
-    console.log(`[Tracking] Session started successfully: ${currentSessionId} (day ${dayNumber}, ${condition})`);
     return data.id;
   } catch (error) {
-    console.error('[Tracking] Exception in startSession:', error);
     return null;
   }
 }
@@ -80,8 +72,8 @@ export async function endSession(reason: string = 'normal'): Promise<void> {
 
   try {
     const duration = sessionStartTime ? Date.now() - sessionStartTime : null;
-    
-    const { error } = await supabase
+
+    await supabase
       .from('sessions')
       .update({
         ended_at: new Date().toISOString(),
@@ -90,16 +82,10 @@ export async function endSession(reason: string = 'normal'): Promise<void> {
       })
       .eq('id', currentSessionId);
 
-    if (error) {
-      console.error('Error ending session:', error);
-    } else {
-      console.log(`[Tracking] Session ended: ${currentSessionId}, duration: ${duration}ms, reason: ${reason}`);
-    }
-    
     currentSessionId = null;
     sessionStartTime = null;
   } catch (error) {
-    console.error('Failed to end session:', error);
+    // Silently fail - session cleanup is best effort
   }
 }
 
@@ -154,11 +140,9 @@ function endSessionSync(reason: string = 'page_unload'): void {
         // Keep pending for retry on next load
       });
     } catch (e) {
-      console.error('[Tracking] Failed to send session end:', e);
+      // Silently fail - will retry on next load
     }
   }
-
-  console.log(`[Tracking] Session ended (sync): ${sessionIdToEnd}, duration: ${duration}ms, reason: ${reason}`);
 
   currentSessionId = null;
   sessionStartTime = null;
@@ -177,17 +161,17 @@ interface VideoRunMetrics {
   // Timing metrics (condition-specific, one will be NULL)
   timeToStartQuizMs?: number; // Control condition only
   timeToClickGenerateGameMs?: number; // Experimental condition only
-  
+
   // Video interaction metrics (cumulative)
   videoCompletionPct?: number; // Captured when clicking return home
   numPauses?: number;
   numResumes?: number;
   captionsOnCount?: number;
   captionsOffCount?: number;
-  
+
   // Quiz completion status
   quizCompleted?: boolean;
-  
+
   // End tracking - only set when clicking return home
   endSession?: boolean; // Flag to trigger ended_at and time calculation
 }
@@ -223,14 +207,11 @@ export async function initializeVideoRun(
       });
 
     if (error) {
-      console.error('Error initializing video run:', error);
       return false;
     }
 
-    console.log(`[Tracking] Video run initialized for participant ${participantId}, video ${videoId}`);
     return true;
   } catch (error) {
-    console.error('Failed to initialize video run:', error);
     return false;
   }
 }
@@ -247,55 +228,48 @@ export async function updateVideoRun(
   try {
     // Convert camelCase to snake_case for database
     const dbMetrics: any = {};
-    
+
     // Timing metrics (condition-specific)
     if (metrics.timeToStartQuizMs !== undefined) dbMetrics.time_to_start_quiz_ms = metrics.timeToStartQuizMs;
     if (metrics.timeToClickGenerateGameMs !== undefined) dbMetrics.time_to_click_generate_game_ms = metrics.timeToClickGenerateGameMs;
-    
+
     // Video interaction metrics
     if (metrics.videoCompletionPct !== undefined) dbMetrics.video_completion_pct = metrics.videoCompletionPct;
     if (metrics.numPauses !== undefined) dbMetrics.num_pauses = metrics.numPauses;
     if (metrics.numResumes !== undefined) dbMetrics.num_resumes = metrics.numResumes;
     if (metrics.captionsOnCount !== undefined) dbMetrics.captions_on_count = metrics.captionsOnCount;
     if (metrics.captionsOffCount !== undefined) dbMetrics.captions_off_count = metrics.captionsOffCount;
-    
+
     // Quiz completion
     if (metrics.quizCompleted !== undefined) dbMetrics.quiz_completed = metrics.quizCompleted;
 
     // ONLY set ended_at when explicitly ending the session (return home click)
     if (metrics.endSession) {
       dbMetrics.ended_at = new Date().toISOString();
-      
+
       // Calculate time_to_click_return_home_ms as the delta between ended_at and started_at
       // We'll use a subquery to calculate this in the database
-      const { data, error: selectError } = await supabase
+      const { data } = await supabase
         .from('video_runs')
         .select('started_at')
         .eq('participant_id', participantId)
         .eq('video_id', videoId)
         .single();
-      
-      if (!selectError && data) {
+
+      if (data) {
         const startedAt = new Date(data.started_at).getTime();
         const endedAt = new Date(dbMetrics.ended_at).getTime();
         dbMetrics.time_to_click_return_home_ms = endedAt - startedAt;
       }
     }
 
-    const { error } = await supabase
+    await supabase
       .from('video_runs')
       .update(dbMetrics)
       .eq('participant_id', participantId)
       .eq('video_id', videoId);
-
-    if (error) {
-      console.error('Error updating video run:', error);
-      console.error('Error details:', error);
-    } else {
-      console.log(`[Tracking] Video run updated for participant ${participantId}, video ${videoId}`);
-    }
   } catch (error) {
-    console.error('Failed to update video run:', error);
+    // Silently fail - tracking updates are best effort
   }
 }
 
@@ -324,10 +298,8 @@ export async function trackEvent(
         event_time: new Date().toISOString(),
         meta: meta || null,
       });
-
-    console.log(`[Tracking] Event: ${eventType}`, meta);
   } catch (error) {
-    console.error('Failed to track event:', error);
+    // Silently fail - event tracking is best effort
   }
 }
 
@@ -347,7 +319,6 @@ async function processPendingSessionEnd(): Promise<void> {
 
   try {
     const pending = JSON.parse(pendingData);
-    console.log('[Tracking] Found pending session end, processing:', pending);
 
     const { error } = await supabase
       .from('sessions')
@@ -358,14 +329,10 @@ async function processPendingSessionEnd(): Promise<void> {
       })
       .eq('id', pending.sessionId);
 
-    if (error) {
-      console.error('[Tracking] Error processing pending session end:', error);
-    } else {
-      console.log('[Tracking] Successfully processed pending session end');
+    if (!error) {
       localStorage.removeItem('pendingSessionEnd');
     }
   } catch (e) {
-    console.error('[Tracking] Failed to parse pending session end:', e);
     localStorage.removeItem('pendingSessionEnd');
   }
 }
@@ -384,26 +351,13 @@ export async function initializeTracking(participantId: string, condition: Condi
   if (!trackingInitialized) {
     // Track page visibility changes
     const handleVisibilityChange = async () => {
-      console.log(`[Tracking] Visibility changed: hidden=${document.hidden}, participantId=${currentParticipantId}, condition=${currentCondition}`);
-
       if (document.hidden) {
         // Tab hidden/minimized - end current session
-        console.log('[Tracking] Tab hidden - ending session...');
-        await endSession('tab_hidden').catch(err =>
-          console.error('Failed to end session on visibility change:', err)
-        );
+        await endSession('tab_hidden').catch(() => {});
       } else {
         // Tab visible again - start new session if we have participant info
-        console.log('[Tracking] Tab visible - checking for session restart...');
         if (currentParticipantId && currentCondition) {
-          console.log('[Tracking] Restarting session...');
           await startSession(currentParticipantId, currentCondition, currentDayNumber);
-        } else {
-          console.warn('[Tracking] Cannot restart session - missing participant info:', {
-            participantId: currentParticipantId,
-            condition: currentCondition,
-            dayNumber: currentDayNumber
-          });
         }
       }
     };
@@ -414,15 +368,14 @@ export async function initializeTracking(participantId: string, condition: Condi
       endSessionSync('page_unload');
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
+
     // Also handle pagehide for mobile browsers
     const handlePageHide = () => {
       endSessionSync('page_hide');
     };
     window.addEventListener('pagehide', handlePageHide);
-    
+
     trackingInitialized = true;
-    console.log('[Tracking] Event listeners initialized - sessions will auto-restart on tab return');
   }
 }
 
@@ -431,10 +384,9 @@ export async function initializeTracking(participantId: string, condition: Condi
  */
 export async function cleanupTracking(): Promise<void> {
   await endSession('logout');
-  
+
   // Clear stored participant info to prevent auto-restart after logout
   currentParticipantId = null;
   currentCondition = null;
   currentDayNumber = 1;
 }
-
