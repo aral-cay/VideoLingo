@@ -81,7 +81,7 @@ export function Login() {
 
         <div className="login-footer">
           <p className="login-help-text">
-            Demo accounts available: Aral, Kabir, Luca, Test, Nikhil
+            Log in with your provided credentials.
           </p>
         </div>
       </div>
