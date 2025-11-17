@@ -13,42 +13,48 @@ export const FAKE_BOTS: FakeBot[] = [
   {
     username: 'Turbomoth',
     participantId: 'fake-bot-1',
-    dailyXP: [35, 40, 30], // Day 1: 35, Day 2: 40, Day 3: 30
+    dailyXP: [35, 40, 30], // XP per day in 3-day cycle (repeats for days 4-6)
   },
   {
     username: 'Batman',
     participantId: 'fake-bot-2',
-    dailyXP: [25, 70, 20], // Day 1: 25, Day 2: 70, Day 3: 20
+    dailyXP: [25, 70, 20], // XP per day in 3-day cycle
   },
   {
     username: 'Tyler the creator',
     participantId: 'fake-bot-3',
-    dailyXP: [40, 25, 35], // Day 1: 40, Day 2: 25, Day 3: 35
+    dailyXP: [40, 25, 35], // XP per day in 3-day cycle
   },
   {
-    username: 'BadBunny2000',
+    username: 'DrakeMaye-O',
     participantId: 'fake-bot-4',
-    dailyXP: [15, 45, 25], // Day 1: 15, Day 2: 45, Day 3: 25
+    dailyXP: [15, 45, 25], // XP per day in 3-day cycle
   },
   {
     username: 'Lil Asparagus',
     participantId: 'fake-bot-5',
-    dailyXP: [50, 40, 50], // Day 1: 50, Day 2: 40, Day 3: 50
+    dailyXP: [50, 40, 50], // XP per day in 3-day cycle
   },
 ];
 
 /**
  * Calculate total XP for a fake bot based on the current day
- * XP is cumulative (total XP up to the current day)
+ * XP resets every 3 days (matching the condition switch in the study)
+ * Uses modulo to cycle through the dailyXP array
  */
 export function getFakeBotXP(bot: FakeBot, dayNumber: number): number {
   // Ensure dayNumber is at least 1
   const currentDay = Math.max(1, dayNumber || 1);
+  
+  // Calculate position within current 3-day cycle (0, 1, or 2)
+  const dayInCycle = (currentDay - 1) % 3;
+  
+  // Accumulate XP from start of current cycle up to current day
   let totalXP = 0;
-  // Sum XP from day 1 up to the current day
-  for (let day = 1; day <= currentDay && day <= bot.dailyXP.length; day++) {
-    totalXP += bot.dailyXP[day - 1];
+  for (let i = 0; i <= dayInCycle; i++) {
+    totalXP += bot.dailyXP[i] || 0;
   }
+  
   return totalXP;
 }
 

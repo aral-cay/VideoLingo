@@ -30,6 +30,8 @@ import GreenWomanProfile from '../assets/characters/Green_woman_profile.png';
 
 export type CharacterEmotion = 'standing' | 'neutral' | 'happy' | 'sad' | 'profile';
 
+export type CharacterType = 'blue' | 'gold' | 'green' | 'purple';
+
 export interface CharacterImages {
   standing: string;
   neutral: string;
@@ -38,30 +40,29 @@ export interface CharacterImages {
   profile: string;
 }
 
-const CHARACTER_MAP: Record<string, CharacterImages> = {
-  'Nikhil': {
+const CHARACTER_MAP: Record<CharacterType, CharacterImages> = {
+  'purple': {
     standing: PurpleGuyStanding,
     neutral: PurpleGuyNeutral,
     happy: PurpleGuyHappy,
     sad: PurpleGuySad,
     profile: PurpleGuyProfile,
   },
-  'Aral': {
+  'blue': {
     standing: BlueGuyStanding,
     neutral: BlueGuyNeutral,
     happy: BlueGuyHappy,
     sad: BlueGuySad,
     profile: BlueGuyProfile,
   },
-  'Test': {
+  'green': {
     standing: GreenWomanStanding,
     neutral: GreenWomanNeutral,
     happy: GreenWomanHappy,
     sad: GreenWomanSad,
     profile: GreenWomanProfile,
   },
-  // Default to Gold Woman for any other gamified users
-  'default': {
+  'gold': {
     standing: GoldWomanStanding,
     neutral: GoldWomanNeutral,
     happy: GoldWomanHappy,
@@ -71,20 +72,29 @@ const CHARACTER_MAP: Record<string, CharacterImages> = {
 };
 
 /**
- * Get character images for a given username
+ * Get character images by character type
+ */
+export function getCharacterImagesByType(character: CharacterType | string | null): CharacterImages {
+  if (!character || !(character in CHARACTER_MAP)) {
+    return CHARACTER_MAP['gold']; // Default to gold
+  }
+  return CHARACTER_MAP[character as CharacterType];
+}
+
+/**
+ * Get character images for a given username (deprecated - use getCharacterImagesByType)
+ * @deprecated Use getCharacterImagesByType with character field instead
  */
 export function getCharacterImages(username: string | null): CharacterImages {
-  if (!username) {
-    return CHARACTER_MAP['default'];
-  }
-  return CHARACTER_MAP[username] || CHARACTER_MAP['default'];
+  // Fallback for backward compatibility
+  return CHARACTER_MAP['gold'];
 }
 
 /**
  * Get a specific character image by emotion
  */
-export function getCharacterImage(username: string | null, emotion: CharacterEmotion): string {
-  const images = getCharacterImages(username);
+export function getCharacterImage(character: string | null, emotion: CharacterEmotion): string {
+  const images = getCharacterImagesByType(character);
   return images[emotion];
 }
 

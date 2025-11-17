@@ -19,7 +19,7 @@ interface LeaderboardEntry {
 }
 
 export function GamifiedHome() {
-  const { participantId, username, logout, dayNumber } = useAuth();
+  const { participantId, username, logout, dayNumber, character } = useAuth();
   const navigate = useNavigate();
   const [gamification, setGamification] = useState<GamificationData>({
     xp: 0,
@@ -93,14 +93,11 @@ export function GamifiedHome() {
   useEffect(() => {
     const loadLeaderboard = async () => {
       try {
-        // Get all gamified users (Aral, Test, Nikhil)
-        const gamifiedUsernames = ['Aral', 'Test', 'Nikhil'];
-        
-        // Fetch participants and their gamification data
+        // Fetch all experimental condition participants dynamically
         const { data: participantsData, error: participantsError } = await supabase
           .from('participants')
           .select('id, username')
-          .in('username', gamifiedUsernames);
+          .eq('condition', 'experimental');
 
         if (participantsError) {
           return;
@@ -292,7 +289,7 @@ export function GamifiedHome() {
           <div className="character-container">
             <div className="character-avatar">
               <img 
-                src={getCharacterImage(username, 'standing')} 
+                src={getCharacterImage(character, 'standing')} 
                 alt={`${username}'s character`}
                 className="character-image"
               />

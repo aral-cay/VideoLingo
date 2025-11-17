@@ -30,7 +30,7 @@ export function GamifiedQuiz({
   participantId,
   onHeartsUpdate,
 }: GamifiedQuizProps) {
-  const { username } = useAuth();
+  const { username, character } = useAuth();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [availableWords, setAvailableWords] = useState<string[]>([]);
@@ -409,7 +409,7 @@ export function GamifiedQuiz({
         {/* Character Display */}
         <div className={`gamified-quiz-character character-emotion-${characterEmotion}`}>
           <img 
-            src={getCharacterImage(username, characterEmotion)} 
+            src={getCharacterImage(character, characterEmotion)} 
             alt={`${username}'s character`}
             className="quiz-character-image"
           />

@@ -9,6 +9,7 @@ interface AuthContextType {
   condition: Condition | null;
   dayNumber: number;
   videoBatch: string;
+  character: string | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
@@ -38,6 +39,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [videoBatch, setVideoBatch] = useState<string>(() => {
     return localStorage.getItem('currentVideoBatch') || 'videos_batch1.json';
   });
+  const [character, setCharacter] = useState<string | null>(() => {
+    return localStorage.getItem('currentCharacter');
+  });
 
   useEffect(() => {
     if (participantId && username && cohort && condition) {
@@ -47,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('currentCondition', condition);
       localStorage.setItem('currentDayNumber', dayNumber.toString());
       localStorage.setItem('currentVideoBatch', videoBatch);
+      if (character) localStorage.setItem('currentCharacter', character);
     } else {
       localStorage.removeItem('currentParticipantId');
       localStorage.removeItem('currentUsername');
@@ -54,8 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('currentCondition');
       localStorage.removeItem('currentDayNumber');
       localStorage.removeItem('currentVideoBatch');
+      localStorage.removeItem('currentCharacter');
     }
-  }, [participantId, username, cohort, condition, dayNumber, videoBatch]);
+  }, [participantId, username, cohort, condition, dayNumber, videoBatch, character]);
 
   // Re-initialize tracking when session is restored from localStorage (page refresh/new tab)
   // Also refresh video_batch from database to catch any manual updates
@@ -103,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Find participant in Supabase participants table
       const { data: participantData, error: participantError } = await supabase
         .from('participants')
-        .select('id, username, password_hash, cohort, condition, day_number, video_batch')
+        .select('id, username, password_hash, cohort, condition, day_number, video_batch, character')
         .eq('username', usernameInput)
         .maybeSingle(); // Use maybeSingle() instead of single() to handle no results gracefully
 
@@ -135,6 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setCondition(participantData.condition as Condition);
       setDayNumber(participantData.day_number || 1);
       setVideoBatch(participantData.video_batch || 'videos_batch1.json');
+      setCharacter(participantData.character || null);
 
       // Initialize participant progress if it doesn't exist for this condition
       await initializeParticipantProgress(participantData.id, participantData.condition as Condition);
@@ -196,6 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCondition(null);
     setDayNumber(1);
     setVideoBatch('videos_batch1.json');
+    setCharacter(null);
   };
 
   return (
@@ -207,6 +215,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         condition,
         dayNumber,
         videoBatch,
+        character,
         login,
         logout,
         isAuthenticated: !!participantId,

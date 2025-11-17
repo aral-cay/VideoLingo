@@ -17,12 +17,13 @@ interface GamificationData {
 interface OtherUserPosition {
   participantId: string;
   username: string;
+  character: string | null;
   position: number; // Index of the last completed video (or first unlocked if none completed)
   color: string;
 }
 
 export function Journey() {
-  const { participantId, username, condition, videoBatch } = useAuth();
+  const { participantId, username, condition, videoBatch, character } = useAuth();
   const navigate = useNavigate();
   const [videos, setVideos] = useState<Video[]>(loadVideoBatch(videoBatch));
   const [videoStates, setVideoStates] = useState<Map<string, { unlocked: boolean; score: number | null; stars: number; totalQuestions: number }>>(new Map());
@@ -134,22 +135,19 @@ export function Journey() {
 
     const loadOtherUsers = async () => {
       try {
-        // Get all gamified users except current user
-        const gamifiedUsernames = ['Aral', 'Test', 'Nikhil'];
-        const otherUsernames = gamifiedUsernames.filter(u => u !== username);
-        
-        if (otherUsernames.length === 0) {
-          setOtherUsers([]);
+        // Fetch all experimental condition participants except current user
+        const { data: participantsData, error: participantsError } = await supabase
+          .from('participants')
+          .select('id, username, condition, character')
+          .eq('condition', 'experimental')
+          .neq('username', username || '');
+
+        if (participantsError || !participantsData) {
           return;
         }
 
-        // Fetch other participants (including their current condition)
-        const { data: participantsData, error: participantsError } = await supabase
-          .from('participants')
-          .select('id, username, condition')
-          .in('username', otherUsernames);
-
-        if (participantsError || !participantsData) {
+        if (participantsData.length === 0) {
+          setOtherUsers([]);
           return;
         }
 
@@ -189,6 +187,7 @@ export function Journey() {
           otherUserPositions.push({
             participantId: participant.id,
             username: participant.username,
+            character: participant.character || null,
             position: position,
             color: userColors[i % userColors.length],
           });
@@ -319,7 +318,7 @@ export function Journey() {
                           >
                             <div className="other-user-avatar current-user-avatar">
                               <img
-                                src={getCharacterImage(username, 'profile')}
+                                src={getCharacterImage(character, 'profile')}
                                 alt="You"
                                 className="other-user-avatar-image"
                               />
@@ -336,7 +335,7 @@ export function Journey() {
                           >
                             <div className="other-user-avatar">
                               <img
-                                src={getCharacterImage(otherUser.username, 'profile')}
+                                src={getCharacterImage(otherUser.character, 'profile')}
                                 alt={otherUser.username}
                                 className="other-user-avatar-image"
                               />
