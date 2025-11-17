@@ -85,7 +85,7 @@ export function getCharacterImagesByType(character: CharacterType | string | nul
  * Get character images for a given username (deprecated - use getCharacterImagesByType)
  * @deprecated Use getCharacterImagesByType with character field instead
  */
-export function getCharacterImages(username: string | null): CharacterImages {
+export function getCharacterImages(_username: string | null): CharacterImages {
   // Fallback for backward compatibility
   return CHARACTER_MAP['gold'];
 }
