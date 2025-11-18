@@ -94,10 +94,18 @@ export function GamifiedHome() {
     const loadLeaderboard = async () => {
       try {
         // Fetch all experimental condition participants dynamically
-        const { data: participantsData, error: participantsError } = await supabase
+        // Exclude admin users from appearing in other users' leaderboards (but not from their own)
+        let query = supabase
           .from('participants')
           .select('id, username')
           .eq('condition', 'experimental');
+        
+        // Only exclude admin users if the current user is NOT an admin
+        if (username !== 'LanguageLearner' && username !== 'GamifiedLanguageLearner') {
+          query = query.not('username', 'in', '(LanguageLearner,GamifiedLanguageLearner)');
+        }
+        
+        const { data: participantsData, error: participantsError } = await query;
 
         if (participantsError) {
           return;

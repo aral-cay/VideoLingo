@@ -136,11 +136,19 @@ export function Journey() {
     const loadOtherUsers = async () => {
       try {
         // Fetch all experimental condition participants except current user
-        const { data: participantsData, error: participantsError } = await supabase
+        // Also exclude admin users from appearing in other users' journey dashboards (but not from their own)
+        let query = supabase
           .from('participants')
           .select('id, username, condition, character')
           .eq('condition', 'experimental')
           .neq('username', username || '');
+        
+        // Only exclude admin users if the current user is NOT an admin
+        if (username !== 'LanguageLearner' && username !== 'GamifiedLanguageLearner') {
+          query = query.not('username', 'in', '(LanguageLearner,GamifiedLanguageLearner)');
+        }
+        
+        const { data: participantsData, error: participantsError } = await query;
 
         if (participantsError || !participantsData) {
           return;
