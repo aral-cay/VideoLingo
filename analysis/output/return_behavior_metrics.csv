@@ -1,0 +1,5 @@
+participant_id,username,condition,total_sessions,first_session_date,last_session_date,study_period_days,avg_hours_between_sessions,min_hours_between_sessions,max_hours_between_sessions,sessions_per_day,returned_after_first_session
+6d756884-0ee0-42a5-9641-bd834d5a6767,Purplestar,experimental,14,2025-11-19T19:52:48.115+00:00,2025-11-19T21:53:17.882+00:00,0.08,0.15,0,0.61,167.31,true
+8391efed-e4cb-4181-80b6-548db040e266,Pajamas,experimental,29,2025-11-18T02:39:16.948+00:00,2025-11-24T20:20:00.415+00:00,6.74,5.77,0,40.85,4.3,true
+b15aaacd-2214-4aef-a7e4-7bc59f7abd11,BadBunny,experimental,15,2025-11-19T19:52:34.109+00:00,2025-11-21T07:27:46.553+00:00,1.48,2.54,0,31.57,10.12,true
+ee3bc785-a2f7-4d83-96a3-77e3c2477a12,Joji,control,5,2025-11-17T23:31:19.991+00:00,2025-11-18T21:14:57.023+00:00,0.91,5.43,0,20.65,5.52,true

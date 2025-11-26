@@ -1,0 +1,5 @@
+participant_id,username,condition,metric_type,avg_time_to_interaction_sec,min_time_to_interaction_sec,max_time_to_interaction_sec,n_interactions,avg_time_on_video_page_sec,n_videos
+6d756884-0ee0-42a5-9641-bd834d5a6767,Purplestar,experimental,time_to_generate_game,4.44,1.55,7.34,2,11611.38,2
+8391efed-e4cb-4181-80b6-548db040e266,Pajamas,experimental,time_to_generate_game,5.49,2.14,11.8,5,569.02,5
+b15aaacd-2214-4aef-a7e4-7bc59f7abd11,BadBunny,experimental,time_to_generate_game,1130.75,1032.14,1229.35,2,1290.44,5
+ee3bc785-a2f7-4d83-96a3-77e3c2477a12,Joji,control,time_to_start_quiz,622.93,622.93,622.93,1,1017.92,2

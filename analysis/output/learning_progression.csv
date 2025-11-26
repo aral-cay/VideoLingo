@@ -1,0 +1,13 @@
+participant_id,username,condition,attempt_number,video_id,quiz_accuracy_pct,correct_count,incorrect_count,completed_at
+6d756884-0ee0-42a5-9641-bd834d5a6767,Purplestar,experimental,1,5,90,9,1,2025-11-19T20:01:18.891+00:00
+6d756884-0ee0-42a5-9641-bd834d5a6767,Purplestar,experimental,2,1,80,8,2,2025-11-20T02:20:16.447+00:00
+8391efed-e4cb-4181-80b6-548db040e266,Pajamas,experimental,1,5,100,10,0,2025-11-18T03:02:27.212+00:00
+8391efed-e4cb-4181-80b6-548db040e266,Pajamas,experimental,2,1,90,9,1,2025-11-19T01:06:26.377+00:00
+8391efed-e4cb-4181-80b6-548db040e266,Pajamas,experimental,3,20,80,8,2,2025-11-21T02:47:55.009+00:00
+8391efed-e4cb-4181-80b6-548db040e266,Pajamas,experimental,4,20,100,10,0,2025-11-21T02:51:15.082+00:00
+8391efed-e4cb-4181-80b6-548db040e266,Pajamas,experimental,5,13,80,8,2,2025-11-22T04:59:04.486+00:00
+b15aaacd-2214-4aef-a7e4-7bc59f7abd11,BadBunny,experimental,1,5,90,9,1,2025-11-19T22:41:38.217+00:00
+b15aaacd-2214-4aef-a7e4-7bc59f7abd11,BadBunny,experimental,2,20,80,8,2,2025-11-21T07:10:47.554+00:00
+b15aaacd-2214-4aef-a7e4-7bc59f7abd11,BadBunny,experimental,3,13,70,7,3,2025-11-21T07:21:01.458+00:00
+b15aaacd-2214-4aef-a7e4-7bc59f7abd11,BadBunny,experimental,4,17,90,9,1,2025-11-21T07:29:12.577+00:00
+ee3bc785-a2f7-4d83-96a3-77e3c2477a12,Joji,control,1,5,10,1,9,2025-11-17T23:48:26.539+00:00

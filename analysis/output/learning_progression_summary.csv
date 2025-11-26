@@ -1,0 +1,5 @@
+participant_id,username,condition,total_quizzes,first_quiz_accuracy_pct,last_quiz_accuracy_pct,accuracy_improvement_pct,improved
+6d756884-0ee0-42a5-9641-bd834d5a6767,Purplestar,experimental,2,90,80,-10,false
+8391efed-e4cb-4181-80b6-548db040e266,Pajamas,experimental,5,100,80,-20,false
+b15aaacd-2214-4aef-a7e4-7bc59f7abd11,BadBunny,experimental,4,90,90,0,false
+ee3bc785-a2f7-4d83-96a3-77e3c2477a12,Joji,control,1,10,10,0,false

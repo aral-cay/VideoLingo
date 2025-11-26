@@ -1,0 +1,5 @@
+participant_id,username,condition,quizzes_started,quizzes_completed,quiz_dropouts,quiz_dropout_rate_pct,quiz_popup_hides
+6d756884-0ee0-42a5-9641-bd834d5a6767,Purplestar,experimental,2,2,0,0,0
+8391efed-e4cb-4181-80b6-548db040e266,Pajamas,experimental,8,5,3,37.5,0
+b15aaacd-2214-4aef-a7e4-7bc59f7abd11,BadBunny,experimental,4,6,-2,-50,0
+ee3bc785-a2f7-4d83-96a3-77e3c2477a12,Joji,control,1,1,0,0,0

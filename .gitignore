@@ -13,6 +13,7 @@ dist-ssr
 *.local
 .env
 .env.local
+dashboard-config.js
 
 # Editor directories and files
 .vscode/*
@@ -24,4 +25,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-*.md

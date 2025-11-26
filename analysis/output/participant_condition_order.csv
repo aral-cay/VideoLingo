@@ -1,0 +1,7 @@
+participant_id,username,cohort,conditions_used,first_condition,second_condition
+21e436a5-0dcb-436d-b39b-952e0d5dc4b5,Violeta,B,none,,
+6d756884-0ee0-42a5-9641-bd834d5a6767,Purplestar,A,single,experimental,
+8391efed-e4cb-4181-80b6-548db040e266,Pajamas,A,single,experimental,
+b15aaacd-2214-4aef-a7e4-7bc59f7abd11,BadBunny,A,single,experimental,
+ead3e61e-8352-49ca-aaed-f714559ea275,Londontown,B,none,,
+ee3bc785-a2f7-4d83-96a3-77e3c2477a12,Joji,B,single,control,

@@ -1,0 +1,5 @@
+participant_id,username,cohort,condition,first_session_in_condition,last_session_in_condition,total_sessions,total_session_time_minutes,videos_attempted,videos_completed,completion_rate_pct,avg_video_completion_pct,total_pauses,total_quiz_attempts,avg_quiz_accuracy_pct,total_correct_answers,total_incorrect_answers,xp,hearts,streak_days
+b15aaacd-2214-4aef-a7e4-7bc59f7abd11,BadBunny,A,experimental,2025-11-19T19:52:34.109+00:00,2025-11-21T07:27:46.553+00:00,15,60.87,5,4,80,0.16,0,4,82.5,33,7,195,14,1
+ee3bc785-a2f7-4d83-96a3-77e3c2477a12,Joji,B,control,2025-11-17T23:31:19.991+00:00,2025-11-18T21:14:57.023+00:00,5,1.08,2,1,50,0.3,0,1,10,1,9,,,
+8391efed-e4cb-4181-80b6-548db040e266,Pajamas,A,experimental,2025-11-18T02:39:16.948+00:00,2025-11-24T20:20:00.415+00:00,29,74.53,5,4,80,0.29,0,5,90,45,5,315,17,3
+6d756884-0ee0-42a5-9641-bd834d5a6767,Purplestar,A,experimental,2025-11-19T19:52:48.115+00:00,2025-11-19T21:53:17.882+00:00,14,191.33,2,2,100,0.17,0,2,85,17,3,105,17,2
